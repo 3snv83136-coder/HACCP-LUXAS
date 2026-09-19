@@ -56,13 +56,30 @@ export function StarWarsAccueil() {
           </div>
 
           <div className="sw-perspective z-20">
-            <div className="sw-crawl text-[clamp(1.35rem,4.6vw,2.4rem)] font-bold leading-[1.45] tracking-wide">
-              <p className="mb-6 text-center uppercase">Épisode I</p>
-              <p className="mb-10 text-center text-[1.15em] uppercase tracking-[0.12em]">Arnaud</p>
-              <p className="mb-8">Je suis ton père.</p>
-              <p>
+            <div className="sw-crawl text-[clamp(1.2rem,4.1vw,2.15rem)] font-bold leading-[1.45] tracking-wide">
+              <p className="mb-5 text-center uppercase">Épisode I</p>
+              <p className="mb-8 text-center text-[1.15em] uppercase tracking-[0.12em]">Arnaud</p>
+              <p className="mb-6">Je suis ton père.</p>
+              <p className="mb-8">
                 Tu es l’enfant du Zinc de Toulon et roi de la galaxie du centre-ville.
               </p>
+              <p className="mb-6">
+                La paix n’a jamais duré longtemps dans la rade. Sur le port, des cantinas juraient
+                servir des moules « comme à la maison », alors que la maison n’avait jamais vu un
+                moule de sa vie. Place de la Liberté, les terrasses se tiraient dessus à coups de
+                formules du midi, chacune prétendant détenir le seul vrai aïoli de la galaxie.
+              </p>
+              <p className="mb-6">
+                Au Mourillon, le sable s’invitait dans les frites comme une épice secrète. À Mayol,
+                on mangeait plus fort qu’on ne jouait. Cours Lafayette, la panisse et la pizza
+                signaient un armistice toutes les cinq minutes… puis recommençaient.
+              </p>
+              <p className="mb-6">
+                Les seigneurs du centre-ville croyaient régner, entre salades tièdes et serveurs
+                Jedi de l’addition. Ils n’avaient pas prévu l’enfant du Zinc : souverain du
+                bouillon, protecteur des tablées, empereur du service qui arrive avant le pain.
+              </p>
+              <p>Que les assiettes soient avec lui.</p>
             </div>
           </div>
         </>

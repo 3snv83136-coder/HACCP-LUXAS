@@ -80,10 +80,10 @@ input[type="number"]::-webkit-outer-spin-button {
 
 @keyframes sw-crawl {
   0% {
-    transform: rotateX(22deg) translateY(110vh);
+    transform: rotateX(22deg) translateY(85vh);
   }
   100% {
-    transform: rotateX(22deg) translateY(-175%);
+    transform: rotateX(22deg) translateY(-240%);
   }
 }
 
@@ -92,11 +92,11 @@ input[type="number"]::-webkit-outer-spin-button {
 }
 
 .sw-blue {
-  animation: sw-blue 5.2s ease-in-out both;
+  animation: sw-blue 3.4s ease-in-out both;
 }
 
 .sw-logo {
-  animation: sw-logo 8s ease-in-out 5.4s both;
+  animation: sw-logo 5.2s ease-in-out 3.5s both;
 }
 
 .sw-perspective {
@@ -117,5 +117,5 @@ input[type="number"]::-webkit-outer-spin-button {
   color: #ffe81f;
   text-align: justify;
   transform-origin: 50% 0%;
-  animation: sw-crawl 58s linear 13.2s both;
+  animation: sw-crawl 22s linear 8.8s both;
 }
