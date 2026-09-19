@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import {
   Archive,
   Bug,
+  ClipboardCheck,
   FileText,
   GraduationCap,
   LayoutDashboard,
@@ -20,6 +21,7 @@ import { BrandLogo } from "@/components/brand/logo";
 
 const nav = [
   { href: "/backoffice", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/backoffice/hygiene", label: "Contrôle hygiène", icon: ClipboardCheck },
   { href: "/backoffice/non-conformites", label: "CAPA", icon: ShieldAlert },
   { href: "/backoffice/equipements", label: "Équipements QR", icon: QrCode },
   { href: "/backoffice/tracabilite", label: "Traçabilité", icon: Tags },

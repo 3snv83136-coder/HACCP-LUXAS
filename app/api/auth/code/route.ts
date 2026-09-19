@@ -8,7 +8,7 @@ export const runtime = "nodejs";
 
 export async function POST(request: Request) {
   const body = (await request.json()) as { code?: string; etablissementId?: string };
-  const code = (body.code ?? "").trim();
+  const code = (body.code ?? "").replace(/\D/g, "").slice(0, 4);
   if (!/^\d{4}$/.test(code)) {
     return NextResponse.json({ error: "Code à 4 chiffres requis" }, { status: 400 });
   }
@@ -57,7 +57,7 @@ export async function POST(request: Request) {
       res.cookies.set(SESSION_COOKIE, token, {
         httpOnly: true,
         sameSite: "lax",
-        secure: process.env.VERCEL === "1",
+        secure: process.env.NODE_ENV === "production",
         path: "/",
         maxAge: 60 * 60 * 12,
       });

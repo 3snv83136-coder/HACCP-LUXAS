@@ -13,6 +13,7 @@ function isProtectedApi(pathname: string) {
   return (
     pathname.startsWith("/api/dashboard") ||
     pathname.startsWith("/api/parametres") ||
+    pathname.startsWith("/api/hygiene") ||
     pathname.startsWith("/api/export-pdf") ||
     pathname.startsWith("/api/documents") ||
     pathname.startsWith("/api/non-conformites") ||
@@ -42,5 +43,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/backoffice/:path*", "/api/:path*"],
+  matcher: ["/backoffice", "/backoffice/:path*", "/api/:path*"],
 };
