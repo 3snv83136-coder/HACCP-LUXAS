@@ -1,0 +1,472 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Organisation {
+  id        String   @id @default(cuid())
+  nom       String
+  siren     String?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  etablissements Etablissement[]
+  utilisateurs   Utilisateur[]
+  parametres     Parametre[]
+
+  @@map("organisation")
+}
+
+model Etablissement {
+  id             String   @id @default(cuid())
+  organisationId String   @map("organisation_id")
+  nom            String
+  adresse        String?
+  typeCuisine    String   @map("type_cuisine")
+  actif          Boolean  @default(true)
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  organisation         Organisation          @relation(fields: [organisationId], references: [id], onDelete: Restrict)
+  membres              MembreEtablissement[]
+  equipements          Equipement[]
+  pointsControle       PointControle[]
+  plansFrequence       PlanFrequence[]
+  relevesTemperature   ReleveTemperature[]
+  receptions           Reception[]
+  lots                 LotProduit[]
+  platsTemoins         PlatTemoin[]
+  produitsNettoyage    ProduitNettoyage[]
+  tachesNettoyage      TacheNettoyage[]
+  executionsNettoyage  ExecutionNettoyage[]
+  checklists           Checklist[]
+  huiles               HuileFriture[]
+  passagesNuisibles    NuisiblesPassage[]
+  nonConformites       NonConformite[]
+  documentsPms         DocumentPms[]
+  auditLogs            AuditLog[]
+  alertes              Alerte[]
+
+  @@index([organisationId])
+  @@map("etablissement")
+}
+
+model Utilisateur {
+  id             String   @id @default(cuid())
+  authUid        String?  @unique @map("auth_uid")
+  organisationId String   @map("organisation_id")
+  nom            String
+  prenom         String
+  email          String?
+  actif          Boolean  @default(true)
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  organisation Organisation          @relation(fields: [organisationId], references: [id], onDelete: Restrict)
+  membres      MembreEtablissement[]
+
+  @@index([organisationId])
+  @@map("utilisateur")
+}
+
+model MembreEtablissement {
+  id               String  @id @default(cuid())
+  utilisateurId    String  @map("utilisateur_id")
+  etablissementId  String  @map("etablissement_id")
+  role             String
+  actif            Boolean @default(true)
+
+  utilisateur    Utilisateur     @relation(fields: [utilisateurId], references: [id], onDelete: Restrict)
+  etablissement  Etablissement   @relation(fields: [etablissementId], references: [id], onDelete: Restrict)
+  codes          CodeOperateur[]
+  formations     Formation[]
+  ncsResponsable NonConformite[] @relation("NcResponsable")
+  ncsValidees    NonConformite[] @relation("NcValideePar")
+
+  @@unique([utilisateurId, etablissementId])
+  @@index([etablissementId, role])
+  @@map("membre_etablissement")
+}
+
+model CodeOperateur {
+  id                     String  @id @default(cuid())
+  membreEtablissementId  String  @map("membre_etablissement_id")
+  codeHash               String  @map("code_hash")
+  actif                  Boolean @default(true)
+
+  membre               MembreEtablissement  @relation(fields: [membreEtablissementId], references: [id], onDelete: Restrict)
+  releves              ReleveTemperature[]
+  receptions           Reception[]
+  executionsNettoyage  ExecutionNettoyage[]
+  platsTemoins         PlatTemoin[]
+  relevesHuile         ReleveHuile[]
+  checklistExecutions  ChecklistExecution[]
+
+  @@index([membreEtablissementId])
+  @@map("code_operateur")
+}
+
+model Equipement {
+  id              String   @id @default(cuid())
+  etablissementId String   @map("etablissement_id")
+  nom             String
+  type            String
+  qrToken         String   @unique @map("qr_token")
+  seuilMin        Float?   @map("seuil_min")
+  seuilMax        Float?   @map("seuil_max")
+  actif           Boolean  @default(true)
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  etablissement Etablissement       @relation(fields: [etablissementId], references: [id], onDelete: Restrict)
+  releves       ReleveTemperature[]
+
+  @@index([etablissementId, actif])
+  @@map("equipement")
+}
+
+model PointControle {
+  id              String  @id @default(cuid())
+  etablissementId String  @map("etablissement_id")
+  libelle         String
+  type            String
+  seuilMin        Float?  @map("seuil_min")
+  seuilMax        Float?  @map("seuil_max")
+  regleTemps      String? @map("regle_temps")
+  actif           Boolean @default(true)
+
+  etablissement Etablissement       @relation(fields: [etablissementId], references: [id], onDelete: Restrict)
+  releves       ReleveTemperature[]
+
+  @@index([etablissementId])
+  @@map("point_controle")
+}
+
+model PlanFrequence {
+  id              String  @id @default(cuid())
+  etablissementId String  @map("etablissement_id")
+  cibleType       String  @map("cible_type")
+  cibleId         String  @map("cible_id")
+  frequence       String
+  horaires        String
+  actif           Boolean @default(true)
+
+  etablissement Etablissement @relation(fields: [etablissementId], references: [id], onDelete: Restrict)
+
+  @@index([etablissementId, cibleType, cibleId])
+  @@map("plan_frequence")
+}
+
+model ReleveTemperature {
+  id              String   @id @default(cuid())
+  clientUuid      String   @unique @map("client_uuid")
+  etablissementId String   @map("etablissement_id")
+  equipementId    String?  @map("equipement_id")
+  pointControleId String?  @map("point_controle_id")
+  valeur          Float
+  conforme        Boolean
+  methode         String
+  codeOperateurId String   @map("code_operateur_id")
+  note            String?
+  photoUrl        String?  @map("photo_url")
+  corrigeParId    String?  @map("corrige_par_id")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  etablissement Etablissement  @relation(fields: [etablissementId], references: [id], onDelete: Restrict)
+  equipement    Equipement?    @relation(fields: [equipementId], references: [id], onDelete: SetNull)
+  pointControle PointControle? @relation(fields: [pointControleId], references: [id], onDelete: SetNull)
+  codeOperateur CodeOperateur  @relation(fields: [codeOperateurId], references: [id], onDelete: Restrict)
+  corrigePar    ReleveTemperature?  @relation("CorrectionReleve", fields: [corrigeParId], references: [id], onDelete: SetNull)
+  corrections   ReleveTemperature[] @relation("CorrectionReleve")
+
+  @@index([etablissementId, createdAt])
+  @@index([equipementId, createdAt])
+  @@map("releve_temperature")
+}
+
+model Reception {
+  id              String   @id @default(cuid())
+  clientUuid      String   @unique @map("client_uuid")
+  etablissementId String   @map("etablissement_id")
+  fournisseur     String
+  blRef           String?  @map("bl_ref")
+  produit         String
+  lot             String?
+  dlc             String?
+  temperature     Float?
+  emballageOk     Boolean  @map("emballage_ok")
+  estampilleOk    Boolean  @map("estampille_ok")
+  conforme        Boolean
+  photoUrl        String?  @map("photo_url")
+  codeOperateurId String   @map("code_operateur_id")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  etablissement Etablissement @relation(fields: [etablissementId], references: [id], onDelete: Restrict)
+  codeOperateur CodeOperateur @relation(fields: [codeOperateurId], references: [id], onDelete: Restrict)
+
+  @@index([etablissementId, createdAt])
+  @@map("reception")
+}
+
+model LotProduit {
+  id              String   @id @default(cuid())
+  etablissementId String   @map("etablissement_id")
+  type            String
+  produit         String
+  lotSource       String?  @map("lot_source")
+  dateDebut       DateTime @map("date_debut")
+  dlcSecondaire   DateTime @map("dlc_secondaire")
+  qrToken         String   @unique @map("qr_token")
+  createdBy       String   @map("created_by")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  etablissement Etablissement @relation(fields: [etablissementId], references: [id], onDelete: Restrict)
+
+  @@index([etablissementId, dlcSecondaire])
+  @@map("lot_produit")
+}
+
+model PlatTemoin {
+  id                String    @id @default(cuid())
+  clientUuid        String    @unique @map("client_uuid")
+  etablissementId   String    @map("etablissement_id")
+  plat              String
+  serviceDate       DateTime  @map("service_date")
+  codeOperateurId   String    @map("code_operateur_id")
+  destructionPrevue DateTime  @map("destruction_prevue")
+  detruitAt         DateTime? @map("detruit_at")
+  createdAt         DateTime  @default(now()) @map("created_at")
+
+  etablissement Etablissement @relation(fields: [etablissementId], references: [id], onDelete: Restrict)
+  codeOperateur CodeOperateur @relation(fields: [codeOperateurId], references: [id], onDelete: Restrict)
+
+  @@index([etablissementId, destructionPrevue])
+  @@map("plat_temoin")
+}
+
+model ProduitNettoyage {
+  id              String  @id @default(cuid())
+  etablissementId String  @map("etablissement_id")
+  nom             String
+  dosage          String?
+  tempsContact    String? @map("temps_contact")
+  fdsUrl          String? @map("fds_url")
+  dangers         String?
+
+  etablissement Etablissement     @relation(fields: [etablissementId], references: [id], onDelete: Restrict)
+  taches        TacheNettoyage[]
+
+  @@index([etablissementId])
+  @@map("produit_nettoyage")
+}
+
+model TacheNettoyage {
+  id                 String  @id @default(cuid())
+  etablissementId    String  @map("etablissement_id")
+  zone               String
+  produitNettoyageId String? @map("produit_nettoyage_id")
+  frequence          String
+  methodeTact        String  @map("methode_tact")
+  roleResponsable    String  @map("role_responsable")
+  actif              Boolean @default(true)
+
+  etablissement    Etablissement        @relation(fields: [etablissementId], references: [id], onDelete: Restrict)
+  produit          ProduitNettoyage?    @relation(fields: [produitNettoyageId], references: [id], onDelete: SetNull)
+  executions       ExecutionNettoyage[]
+
+  @@index([etablissementId, actif])
+  @@map("tache_nettoyage")
+}
+
+model ExecutionNettoyage {
+  id               String   @id @default(cuid())
+  clientUuid       String   @unique @map("client_uuid")
+  tacheNettoyageId String   @map("tache_nettoyage_id")
+  etablissementId  String   @map("etablissement_id")
+  codeOperateurId  String   @map("code_operateur_id")
+  faitAt           DateTime @map("fait_at")
+  note             String?
+  photoUrl         String?  @map("photo_url")
+
+  tache         TacheNettoyage @relation(fields: [tacheNettoyageId], references: [id], onDelete: Restrict)
+  etablissement Etablissement  @relation(fields: [etablissementId], references: [id], onDelete: Restrict)
+  codeOperateur CodeOperateur  @relation(fields: [codeOperateurId], references: [id], onDelete: Restrict)
+
+  @@index([etablissementId, faitAt])
+  @@map("execution_nettoyage")
+}
+
+model Checklist {
+  id              String  @id @default(cuid())
+  etablissementId String  @map("etablissement_id")
+  nom             String
+  type            String
+  actif           Boolean @default(true)
+
+  etablissement Etablissement         @relation(fields: [etablissementId], references: [id], onDelete: Restrict)
+  items         ChecklistItem[]
+  executions    ChecklistExecution[]
+
+  @@index([etablissementId])
+  @@map("checklist")
+}
+
+model ChecklistItem {
+  id          String  @id @default(cuid())
+  checklistId String  @map("checklist_id")
+  libelle     String
+  ordre       Int     @default(0)
+
+  checklist Checklist @relation(fields: [checklistId], references: [id], onDelete: Cascade)
+
+  @@map("checklist_item")
+}
+
+model ChecklistExecution {
+  id              String   @id @default(cuid())
+  clientUuid      String   @unique @map("client_uuid")
+  checklistId     String   @map("checklist_id")
+  codeOperateurId String   @map("code_operateur_id")
+  itemsJson       String   @map("items_json")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  checklist     Checklist     @relation(fields: [checklistId], references: [id], onDelete: Restrict)
+  codeOperateur CodeOperateur @relation(fields: [codeOperateurId], references: [id], onDelete: Restrict)
+
+  @@map("checklist_execution")
+}
+
+model HuileFriture {
+  id              String  @id @default(cuid())
+  etablissementId String  @map("etablissement_id")
+  bac             String
+  actif           Boolean @default(true)
+
+  etablissement Etablissement @relation(fields: [etablissementId], references: [id], onDelete: Restrict)
+  releves       ReleveHuile[]
+
+  @@map("huile_friture")
+}
+
+model ReleveHuile {
+  id              String   @id @default(cuid())
+  clientUuid      String   @unique @map("client_uuid")
+  huileId         String   @map("huile_id")
+  composesPolaires Float   @map("composes_polaires")
+  action          String
+  codeOperateurId String   @map("code_operateur_id")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  huile         HuileFriture  @relation(fields: [huileId], references: [id], onDelete: Restrict)
+  codeOperateur CodeOperateur @relation(fields: [codeOperateurId], references: [id], onDelete: Restrict)
+
+  @@map("releve_huile")
+}
+
+model NuisiblesPassage {
+  id              String   @id @default(cuid())
+  etablissementId String   @map("etablissement_id")
+  prestataire     String
+  date            DateTime
+  observations    String?
+  rapportUrl      String?  @map("rapport_url")
+
+  etablissement Etablissement @relation(fields: [etablissementId], references: [id], onDelete: Restrict)
+
+  @@map("nuisibles_passage")
+}
+
+model Formation {
+  id                    String    @id @default(cuid())
+  membreEtablissementId String    @map("membre_etablissement_id")
+  type                  String
+  obtenueLe             DateTime  @map("obtenue_le")
+  expireLe              DateTime? @map("expire_le")
+  attestationUrl        String?   @map("attestation_url")
+
+  membre MembreEtablissement @relation(fields: [membreEtablissementId], references: [id], onDelete: Restrict)
+
+  @@map("formation")
+}
+
+model NonConformite {
+  id                String    @id @default(cuid())
+  etablissementId   String    @map("etablissement_id")
+  source            String
+  sourceId          String?   @map("source_id")
+  constat           String
+  gravite           String
+  cause             String?
+  actionImmediate   String?   @map("action_immediate")
+  actionPreventive  String?   @map("action_preventive")
+  responsableId     String?   @map("responsable_id")
+  echeance          DateTime?
+  statut            String    @default("ouvert")
+  preuveUrl         String?   @map("preuve_url")
+  clotureAt         DateTime? @map("cloture_at")
+  valideParId       String?   @map("valide_par_id")
+  createdAt         DateTime  @default(now()) @map("created_at")
+
+  etablissement Etablissement         @relation(fields: [etablissementId], references: [id], onDelete: Restrict)
+  responsable   MembreEtablissement?  @relation("NcResponsable", fields: [responsableId], references: [id], onDelete: SetNull)
+  validePar     MembreEtablissement?  @relation("NcValideePar", fields: [valideParId], references: [id], onDelete: SetNull)
+
+  @@index([etablissementId, statut])
+  @@map("non_conformite")
+}
+
+model DocumentPms {
+  id              String   @id @default(cuid())
+  etablissementId String   @map("etablissement_id")
+  titre           String
+  categorie       String
+  version         String
+  fichierUrl      String?  @map("fichier_url")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  etablissement Etablissement @relation(fields: [etablissementId], references: [id], onDelete: Restrict)
+
+  @@map("document_pms")
+}
+
+model Parametre {
+  id              String @id @default(cuid())
+  organisationId  String @map("organisation_id")
+  cle             String
+  valeur          String
+
+  organisation Organisation @relation(fields: [organisationId], references: [id], onDelete: Restrict)
+
+  @@unique([organisationId, cle])
+  @@map("parametre")
+}
+
+model Alerte {
+  id              String   @id @default(cuid())
+  etablissementId String   @map("etablissement_id")
+  type            String
+  message         String
+  canal           String   @default("in_app")
+  lu              Boolean  @default(false)
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  etablissement Etablissement @relation(fields: [etablissementId], references: [id], onDelete: Restrict)
+
+  @@index([etablissementId, createdAt])
+  @@map("alerte")
+}
+
+model AuditLog {
+  id              String   @id @default(cuid())
+  etablissementId String   @map("etablissement_id")
+  acteur          String
+  action          String
+  cible           String
+  payloadJson     String   @map("payload_json")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  etablissement Etablissement @relation(fields: [etablissementId], references: [id], onDelete: Restrict)
+
+  @@index([etablissementId, createdAt])
+  @@map("audit_log")
+}

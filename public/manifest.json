@@ -1,0 +1,18 @@
+{
+  "name": "Sanitrace",
+  "short_name": "Sanitrace",
+  "description": "Contrôle sanitaire HACCP — relevés, ménage, traçabilité.",
+  "start_url": "/terrain",
+  "display": "standalone",
+  "background_color": "#07111a",
+  "theme_color": "#07111a",
+  "lang": "fr",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
