@@ -62,15 +62,15 @@ input[type="number"]::-webkit-outer-spin-button {
 @keyframes sw-logo {
   0% {
     opacity: 0;
-    transform: scale(2.4);
+    transform: scale(2.2);
   }
-  18% {
+  22% {
     opacity: 1;
     transform: scale(1);
   }
-  78% {
+  62% {
     opacity: 1;
-    transform: scale(0.35);
+    transform: scale(0.42);
   }
   100% {
     opacity: 0;
@@ -80,7 +80,7 @@ input[type="number"]::-webkit-outer-spin-button {
 
 @keyframes sw-crawl {
   0% {
-    transform: rotateX(22deg) translateY(85vh);
+    transform: rotateX(22deg) translateY(42vh);
   }
   100% {
     transform: rotateX(22deg) translateY(-240%);
@@ -96,7 +96,7 @@ input[type="number"]::-webkit-outer-spin-button {
 }
 
 .sw-logo {
-  animation: sw-logo 5.2s ease-in-out 3.5s both;
+  animation: sw-logo 4.4s ease-in-out 3.2s both;
 }
 
 .sw-perspective {
@@ -117,5 +117,5 @@ input[type="number"]::-webkit-outer-spin-button {
   color: #ffe81f;
   text-align: justify;
   transform-origin: 50% 0%;
-  animation: sw-crawl 22s linear 8.8s both;
+  animation: sw-crawl 28s linear 5.6s both;
 }

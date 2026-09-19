@@ -1,8 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Pathway_Gothic_One } from "next/font/google";
+import { Volume2, VolumeX } from "lucide-react";
+import { playOuvertureGalactique } from "@/lib/home/fanfare";
 
 const crawlFont = Pathway_Gothic_One({
   weight: "400",
@@ -18,7 +20,31 @@ const etoiles = Array.from({ length: 140 }, (_, i) => ({
 
 export function StarWarsAccueil() {
   const [fini, setFini] = useState(false);
+  const [son, setSon] = useState(false);
+  const stopRef = useRef<(() => void) | null>(null);
   const stars = useMemo(() => etoiles, []);
+
+  function couperSon() {
+    stopRef.current?.();
+    stopRef.current = null;
+    setSon(false);
+  }
+
+  function lancerSon() {
+    couperSon();
+    stopRef.current = playOuvertureGalactique();
+    setSon(true);
+  }
+
+  useEffect(() => {
+    return () => {
+      stopRef.current?.();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (fini) couperSon();
+  }, [fini]);
 
   return (
     <main className={`${crawlFont.className} relative min-h-dvh overflow-hidden bg-black text-[#ffe81f]`}>
@@ -37,6 +63,16 @@ export function StarWarsAccueil() {
           />
         ))}
       </div>
+
+      <button
+        type="button"
+        onClick={() => (son ? couperSon() : lancerSon())}
+        className="absolute right-4 top-4 z-40 inline-flex h-11 items-center gap-2 rounded-full border border-[#ffe81f]/50 px-3 text-[11px] uppercase tracking-[0.22em] text-[#ffe81f]"
+        aria-label={son ? "Couper la musique" : "Lancer la musique"}
+      >
+        {son ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
+        {son ? "Son" : "Musique"}
+      </button>
 
       {!fini ? (
         <>
