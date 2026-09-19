@@ -25,12 +25,12 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     title: "Sanitrace",
-    statusBarStyle: "black-translucent",
+    statusBarStyle: "default",
   },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#07111a",
+  themeColor: "#ffffff",
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,

@@ -89,8 +89,8 @@ export default function RelevePage() {
   if (!cible) {
     return (
       <div className="space-y-4">
-        <h1 className="text-2xl font-semibold text-white">QR inconnu</h1>
-        <p className="text-white/60">Aucun équipement pour « {qr} ».</p>
+        <h1 className="text-2xl font-semibold text-slate-900">QR inconnu</h1>
+        <p className="text-slate-500">Aucun équipement pour « {qr} ».</p>
         <Button variant="outline" onClick={() => router.push("/terrain/scan")}>
           Retour au scan
         </Button>
@@ -104,8 +104,8 @@ export default function RelevePage() {
         <Badge variant={done.conforme ? "ok" : "nok"} className="px-4 py-2 text-sm">
           {done.conforme ? "Conforme" : "Non conforme"}
         </Badge>
-        <p className="mt-4 font-mono text-6xl text-white">{formatTemp(done.valeur)}</p>
-        <p className="mt-3 text-white/60">
+        <p className="mt-4 font-mono text-6xl text-slate-900">{formatTemp(done.valeur)}</p>
+        <p className="mt-3 text-slate-500">
           Signé {session.prenom} {session.nom}
           {!done.conforme ? " · non-conformité ouverte" : ""}
         </p>
@@ -119,15 +119,15 @@ export default function RelevePage() {
   return (
     <div className="space-y-5 pb-10">
       <div>
-        <p className="text-xs uppercase tracking-[0.16em] text-teal-300">{cible.type.replaceAll("_", " ")}</p>
-        <h1 className="mt-1 text-2xl font-semibold text-white">{cible.nom}</h1>
-        <p className="mt-1 text-sm text-white/50">
+        <p className="text-xs uppercase tracking-[0.16em] text-teal-700">{cible.type.replaceAll("_", " ")}</p>
+        <h1 className="mt-1 text-2xl font-semibold text-slate-900">{cible.nom}</h1>
+        <p className="mt-1 text-sm text-slate-500">
           Seuil PMS : {cible.seuilMin != null ? `≥ ${cible.seuilMin} °C` : ""}
           {cible.seuilMin != null && cible.seuilMax != null ? " · " : ""}
           {cible.seuilMax != null ? `≤ ${cible.seuilMax} °C` : ""}
         </p>
         {last ? (
-          <p className="mt-1 text-sm text-white/40">
+          <p className="mt-1 text-sm text-slate-400">
             Dernier : {formatTemp(last.valeur)} · {formatHeure(last.createdAt)} · {last.auteurNom}
           </p>
         ) : null}
@@ -136,14 +136,14 @@ export default function RelevePage() {
       <div
         className={`rounded-3xl border p-5 text-center ${
           preview == null
-            ? "border-white/10 bg-white/[0.03]"
+            ? "border-slate-200 bg-slate-50"
             : preview
               ? "border-emerald-400/40 bg-emerald-500/10"
               : "border-red-400/40 bg-red-500/10"
         }`}
       >
-        <p className="font-mono text-6xl tracking-tight text-white">{raw || "—"}</p>
-        <p className="mt-2 text-sm text-white/50">°C</p>
+        <p className="font-mono text-6xl tracking-tight text-slate-900">{raw || "—"}</p>
+        <p className="mt-2 text-sm text-slate-500">°C</p>
         {preview != null ? (
           <div className="mt-3">
             <Badge variant={preview ? "ok" : "nok"}>{preview ? "OK" : "NOK — NC auto"}</Badge>
@@ -163,7 +163,7 @@ export default function RelevePage() {
             type="button"
             onClick={() => setMethode(m.id)}
             className={`rounded-2xl border px-3 py-3 text-sm ${
-              methode === m.id ? "border-teal-400 bg-teal-400/10 text-white" : "border-white/10 text-white/60"
+              methode === m.id ? "border-teal-500 bg-teal-50 text-slate-900" : "border-slate-200 text-slate-500"
             }`}
           >
             {m.label}
@@ -175,7 +175,7 @@ export default function RelevePage() {
         value={note}
         onChange={(e) => setNote(e.target.value)}
         placeholder="Note (optionnel)"
-        className="h-12 w-full rounded-2xl border border-white/10 bg-black/30 px-4 text-white placeholder:text-white/30"
+        className="h-12 w-full rounded-2xl border border-slate-200 bg-white px-4 text-slate-900 placeholder:text-slate-400"
       />
 
       <Button

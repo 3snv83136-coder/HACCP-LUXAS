@@ -45,9 +45,9 @@ export function QrScanner({ onResult }: QrScannerProps) {
     <div className="space-y-3">
       <div
         id="sanitrace-qr-reader"
-        className="min-h-64 overflow-hidden rounded-3xl border border-white/10 bg-black"
+        className="min-h-64 overflow-hidden rounded-3xl border border-slate-200 bg-black"
       />
-      {error ? <p className="text-sm text-amber-200">{error}</p> : null}
+      {error ? <p className="text-sm text-amber-700">{error}</p> : null}
       {running ? (
         <Button
           variant="outline"

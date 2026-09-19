@@ -37,8 +37,8 @@ export default function HuilePage() {
 
   return (
     <div className="space-y-4 pb-10">
-      <h1 className="text-2xl font-semibold text-white">Huiles de friture</h1>
-      <p className="text-sm text-white/55">Contrôle visuel + % composés polaires. Seuil issu du PMS.</p>
+      <h1 className="text-2xl font-semibold text-slate-900">Huiles de friture</h1>
+      <p className="text-sm text-slate-500">Contrôle visuel + % composés polaires. Seuil issu du PMS.</p>
       <div className="grid gap-2">
         {bootstrap.huiles.map((h) => (
           <button
@@ -46,18 +46,18 @@ export default function HuilePage() {
             type="button"
             onClick={() => setHuileId(h.id)}
             className={`rounded-2xl border px-4 py-3 text-left ${
-              huileId === h.id ? "border-teal-400 bg-teal-400/10" : "border-white/10"
+              huileId === h.id ? "border-teal-500 bg-teal-50" : "border-slate-200"
             }`}
           >
-            <p className="font-medium text-white">{h.bac}</p>
-            <p className="text-xs text-white/45">
+            <p className="font-medium text-slate-900">{h.bac}</p>
+            <p className="text-xs text-slate-500">
               {h.dernierPolaires != null ? `Dernier : ${h.dernierPolaires} %` : "Pas encore de relevé"}
             </p>
           </button>
         ))}
       </div>
-      <div className="rounded-3xl border border-white/10 p-5 text-center">
-        <p className="font-mono text-5xl text-white">{raw || "—"} %</p>
+      <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5 text-center">
+        <p className="font-mono text-5xl text-slate-900">{raw || "—"} %</p>
         {horsSeuil != null ? (
           <div className="mt-2">
             <Badge variant={horsSeuil ? "nok" : "ok"}>{horsSeuil ? "NOK — vidange" : "OK"}</Badge>

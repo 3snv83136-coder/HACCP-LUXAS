@@ -40,10 +40,10 @@ export function SyncPill() {
       className={cn(
         "inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-wide",
         !online
-          ? "bg-amber-500/20 text-amber-200"
+          ? "bg-amber-100 text-amber-800"
           : pending > 0
-            ? "bg-sky-500/20 text-sky-200"
-            : "bg-emerald-500/15 text-emerald-300",
+            ? "bg-sky-100 text-sky-800"
+            : "bg-emerald-100 text-emerald-800",
       )}
     >
       {!online ? <WifiOff className="h-3.5 w-3.5" /> : pending > 0 ? <CloudUpload className="h-3.5 w-3.5" /> : <Wifi className="h-3.5 w-3.5" />}

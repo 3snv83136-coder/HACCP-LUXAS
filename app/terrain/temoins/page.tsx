@@ -47,8 +47,8 @@ export default function TemoinsPage() {
 
   return (
     <div className="space-y-4 pb-10">
-      <h1 className="text-2xl font-semibold text-white">Plats témoins</h1>
-      <p className="text-sm text-white/55">
+      <h1 className="text-2xl font-semibold text-slate-900">Plats témoins</h1>
+      <p className="text-sm text-slate-500">
         Conservation selon le PMS (paramètre PLAT_TEMOIN_JOURS), portions ~80–100 g, ≤ seuil froid.
       </p>
       <label className="block space-y-2">
@@ -62,11 +62,11 @@ export default function TemoinsPage() {
         {bootstrap.platsTemoins.map((p) => {
           const due = !p.detruitAt && new Date(p.destructionPrevue) <= new Date();
           return (
-            <article key={p.id} className="rounded-3xl border border-white/10 bg-white/[0.04] p-4">
+            <article key={p.id} className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
               <div className="flex items-start justify-between gap-2">
                 <div>
-                  <p className="font-semibold text-white">{p.plat}</p>
-                  <p className="text-xs text-white/45">
+                  <p className="font-semibold text-slate-900">{p.plat}</p>
+                  <p className="text-xs text-slate-500">
                     Service {new Date(p.serviceDate).toLocaleString("fr-FR")} · destruction{" "}
                     {new Date(p.destructionPrevue).toLocaleDateString("fr-FR")}
                   </p>

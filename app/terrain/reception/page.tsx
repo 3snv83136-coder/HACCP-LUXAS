@@ -63,7 +63,7 @@ export default function ReceptionPage() {
         void submit();
       }}
     >
-      <h1 className="text-2xl font-semibold text-white">Réception marchandise</h1>
+      <h1 className="text-2xl font-semibold text-slate-900">Réception marchandise</h1>
       <Field label="Fournisseur">
         <Input required value={form.fournisseur} onChange={(e) => set("fournisseur", e.target.value)} />
       </Field>
@@ -123,7 +123,7 @@ function Toggle({
       type="button"
       onClick={() => onChange(!value)}
       className={`flex w-full items-center justify-between rounded-2xl border px-4 py-3 text-sm ${
-        value ? "border-emerald-400/40 bg-emerald-500/10 text-white" : "border-red-400/40 bg-red-500/10 text-white"
+        value ? "border-emerald-300 bg-emerald-50 text-slate-900" : "border-red-300 bg-red-50 text-slate-900"
       }`}
     >
       {label}

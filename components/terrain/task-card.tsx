@@ -15,7 +15,7 @@ export function TaskCard({ tache }: { tache: TacheDuJour }) {
   return (
     <Link
       href={tache.href}
-      className="flex items-center gap-3 rounded-3xl border border-white/10 bg-white/[0.04] p-4 active:scale-[0.99]"
+      className="flex items-center gap-3 rounded-3xl border border-slate-200 bg-white p-4 shadow-sm active:scale-[0.99]"
     >
       <div
         className={`h-12 w-1.5 rounded-full ${
@@ -30,18 +30,18 @@ export function TaskCard({ tache }: { tache: TacheDuJour }) {
       />
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
-          <p className="truncate font-semibold text-white">{tache.titre}</p>
+          <p className="truncate font-semibold text-slate-900">{tache.titre}</p>
           <Badge variant={badge.variant}>{badge.label}</Badge>
         </div>
-        <p className="mt-1 truncate text-sm text-white/50">{tache.sousTitre}</p>
+        <p className="mt-1 truncate text-sm text-slate-500">{tache.sousTitre}</p>
         {tache.lastValue != null ? (
-          <p className="mt-1 font-mono text-sm text-white/70">
+          <p className="mt-1 font-mono text-sm text-slate-600">
             {formatTemp(tache.lastValue)}
             {tache.lastAt ? ` · ${formatHeure(tache.lastAt)}` : ""}
           </p>
         ) : null}
       </div>
-      <ChevronRight className="h-5 w-5 text-white/30" />
+      <ChevronRight className="h-5 w-5 text-slate-300" />
     </Link>
   );
 }

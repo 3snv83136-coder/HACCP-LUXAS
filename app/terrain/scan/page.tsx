@@ -32,8 +32,8 @@ export default function ScanPage() {
 
   return (
     <div className="space-y-4 pb-10">
-      <h1 className="text-2xl font-semibold text-white">Scanner un équipement</h1>
-      <p className="text-sm text-white/55">Vise le QR collé sur le frigo, la chambre ou la vitrine.</p>
+      <h1 className="text-2xl font-semibold text-slate-900">Scanner un équipement</h1>
+      <p className="text-sm text-slate-500">Vise le QR collé sur le frigo, la chambre ou la vitrine.</p>
       {!manual ? <QrScanner onResult={onResult} /> : null}
       <Button variant="outline" className="w-full" onClick={() => setManual((v) => !v)}>
         {manual ? "Revenir au scan" : "Choisir dans la liste"}
@@ -44,10 +44,10 @@ export default function ScanPage() {
             <Link
               key={eq.id}
               href={`/terrain/releve/${eq.qrToken}`}
-              className="block rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-white"
+              className="block rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 shadow-sm"
             >
               <p className="font-medium">{eq.nom}</p>
-              <p className="text-xs text-white/45">{eq.qrToken}</p>
+              <p className="text-xs text-slate-500">{eq.qrToken}</p>
             </Link>
           ))}
         </div>

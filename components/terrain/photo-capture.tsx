@@ -18,11 +18,11 @@ export function PhotoCapture({ value, onChange, label }: PhotoCaptureProps) {
 
   return (
     <div className="space-y-2">
-      <p className="text-xs font-medium uppercase tracking-[0.16em] text-white/50">{label}</p>
+      <p className="text-xs font-medium uppercase tracking-[0.16em] text-slate-500">{label}</p>
       <button
         type="button"
         onClick={() => inputRef.current?.click()}
-        className="w-full rounded-2xl border border-dashed border-white/20 bg-black/20 px-4 py-6 text-sm text-white/70"
+        className="w-full rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-4 py-6 text-sm text-slate-600"
       >
         {value ? "Remplacer la photo" : "Prendre / importer une photo"}
       </button>

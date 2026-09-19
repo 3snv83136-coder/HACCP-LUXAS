@@ -22,14 +22,14 @@ export default function TerrainHomePage() {
 
   return (
     <div className="space-y-5 pb-8">
-      <section className="rounded-3xl border border-white/10 bg-gradient-to-br from-teal-500/15 to-transparent p-5">
-        <p className="text-xs uppercase tracking-[0.18em] text-teal-200">Aujourd’hui</p>
-        <h1 className="mt-1 text-3xl font-semibold text-white">Mes tâches</h1>
-        <p className="mt-2 text-sm text-white/60">
+      <section className="rounded-3xl border border-slate-200 bg-teal-50 p-5">
+        <p className="text-xs uppercase tracking-[0.18em] text-teal-700">Aujourd’hui</p>
+        <h1 className="mt-1 text-3xl font-semibold text-slate-900">Mes tâches</h1>
+        <p className="mt-2 text-sm text-slate-500">
           {aFaire} à faire
           {retard > 0 ? ` · ${retard} en retard` : ""} · {bootstrap.nonConformitesOuvertes} NC ouvertes
         </p>
-        <button type="button" onClick={() => void refresh()} className="mt-3 text-xs text-white/40">
+        <button type="button" onClick={() => void refresh()} className="mt-3 text-xs text-slate-400">
           Actualiser
         </button>
       </section>
@@ -39,9 +39,9 @@ export default function TerrainHomePage() {
           <Link
             key={s.href}
             href={s.href}
-            className="flex flex-col items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.04] py-3 text-[10px] font-medium uppercase tracking-wide text-white/70"
+            className="flex flex-col items-center gap-2 rounded-2xl border border-slate-200 bg-white py-3 text-[10px] font-medium uppercase tracking-wide text-slate-600 shadow-sm"
           >
-            <s.icon className="h-5 w-5 text-teal-300" />
+            <s.icon className="h-5 w-5 text-teal-700" />
             {s.label}
           </Link>
         ))}
@@ -49,7 +49,7 @@ export default function TerrainHomePage() {
 
       <div className="space-y-2">
         {taches.length === 0 ? (
-          <p className="flex items-center gap-2 text-sm text-white/50">
+          <p className="flex items-center gap-2 text-sm text-slate-500">
             <ClipboardList className="h-4 w-4" /> Aucune tâche paramétrée
           </p>
         ) : (

@@ -53,8 +53,8 @@ function MenageInner() {
   return (
     <div className="space-y-6 pb-10">
       <div>
-        <h1 className="text-2xl font-semibold text-white">Plan de nettoyage</h1>
-        <p className="text-sm text-white/55">
+        <h1 className="text-2xl font-semibold text-slate-900">Plan de nettoyage</h1>
+        <p className="text-sm text-slate-500">
           Planning du jour, méthode TACT, signature. {retard ? "Des tâches sont en retard." : ""}
         </p>
       </div>
@@ -69,23 +69,23 @@ function MenageInner() {
           <div
             key={tache.id}
             id={tache.id}
-            className={`rounded-3xl border bg-white/[0.04] p-4 ${
-              highlight ? "border-teal-400" : "border-white/10"
+            className={`rounded-3xl border bg-white p-4 shadow-sm ${
+              highlight ? "border-teal-500" : "border-slate-200"
             }`}
           >
             <div className="flex items-start justify-between gap-3">
               <div>
-                <p className="font-semibold text-white">{tache.zone}</p>
-                <p className="mt-1 text-xs text-white/45">
+                <p className="font-semibold text-slate-900">{tache.zone}</p>
+                <p className="mt-1 text-xs text-slate-500">
                   {tache.frequence} · {tache.produitNom ?? "sans produit"}
                   {tache.produitDosage ? ` ${tache.produitDosage}` : ""} · {tache.roleResponsable}
                 </p>
               </div>
               <Badge variant={done ? "ok" : retard ? "warn" : "info"}>{done ? "Fait" : "À faire"}</Badge>
             </div>
-            <p className="mt-3 text-sm text-white/60">{tache.methodeTact}</p>
+            <p className="mt-3 text-sm text-slate-600">{tache.methodeTact}</p>
             {tache.produitDangers ? (
-              <p className="mt-2 text-xs text-amber-200">FDS / dangers : {tache.produitDangers}</p>
+              <p className="mt-2 text-xs text-amber-700">FDS / dangers : {tache.produitDangers}</p>
             ) : null}
             {!done ? (
               <Button className="mt-4 w-full" onClick={() => void cocher(tache.id)}>
@@ -102,15 +102,15 @@ function MenageInner() {
         );
         const allChecked = cl.items.every((i) => checks[i.id]);
         return (
-          <div key={cl.id} className="rounded-3xl border border-white/10 bg-white/[0.04] p-4">
+          <div key={cl.id} className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
             <div className="flex items-center justify-between">
-              <h2 className="font-semibold text-white">{cl.nom}</h2>
+              <h2 className="font-semibold text-slate-900">{cl.nom}</h2>
               <Badge variant={done ? "ok" : "info"}>{cl.type}</Badge>
             </div>
             <ul className="mt-3 space-y-2">
               {cl.items.map((item) => (
                 <li key={item.id}>
-                  <label className="flex items-center gap-3 text-sm text-white/80">
+                  <label className="flex items-center gap-3 text-sm text-slate-700">
                     <input
                       type="checkbox"
                       checked={Boolean(checks[item.id]) || done}
@@ -132,7 +132,7 @@ function MenageInner() {
                 Signer la check-list · {session.prenom}
               </Button>
             ) : (
-              <p className="mt-3 text-xs text-emerald-300">Signée aujourd’hui</p>
+              <p className="mt-3 text-xs text-emerald-700">Signée aujourd’hui</p>
             )}
           </div>
         );
@@ -143,7 +143,7 @@ function MenageInner() {
 
 export default function MenagePage() {
   return (
-    <Suspense fallback={<p className="text-white/50">Chargement du plan de nettoyage…</p>}>
+    <Suspense fallback={<p className="text-slate-500">Chargement du plan de nettoyage…</p>}>
       <MenageInner />
     </Suspense>
   );

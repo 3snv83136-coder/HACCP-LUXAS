@@ -4,8 +4,8 @@
   "description": "Contrôle sanitaire HACCP — relevés, ménage, traçabilité.",
   "start_url": "/terrain",
   "display": "standalone",
-  "background_color": "#07111a",
-  "theme_color": "#07111a",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
   "lang": "fr",
   "icons": [
     {

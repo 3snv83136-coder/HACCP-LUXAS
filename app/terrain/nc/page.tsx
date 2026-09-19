@@ -40,7 +40,7 @@ export default function NcPage() {
         void submit();
       }}
     >
-      <h1 className="text-2xl font-semibold text-white">Signaler une non-conformité</h1>
+      <h1 className="text-2xl font-semibold text-slate-900">Signaler une non-conformité</h1>
       <label className="block space-y-2">
         <Label>Constat</Label>
         <textarea
@@ -48,7 +48,7 @@ export default function NcPage() {
           value={constat}
           onChange={(e) => setConstat(e.target.value)}
           rows={4}
-          className="w-full rounded-2xl border border-white/10 bg-black/30 p-4 text-white"
+          className="w-full rounded-2xl border border-slate-200 bg-white p-4 text-slate-900"
         />
       </label>
       <label className="block space-y-2">
@@ -57,7 +57,7 @@ export default function NcPage() {
           value={actionImmediate}
           onChange={(e) => setActionImmediate(e.target.value)}
           rows={3}
-          className="w-full rounded-2xl border border-white/10 bg-black/30 p-4 text-white"
+          className="w-full rounded-2xl border border-slate-200 bg-white p-4 text-slate-900"
         />
       </label>
       <div className="grid grid-cols-3 gap-2">
@@ -67,7 +67,7 @@ export default function NcPage() {
             type="button"
             onClick={() => setGravite(g)}
             className={`rounded-2xl border py-3 text-sm capitalize ${
-              gravite === g ? "border-amber-400 bg-amber-400/10 text-white" : "border-white/10 text-white/50"
+              gravite === g ? "border-amber-500 bg-amber-50 text-slate-900" : "border-slate-200 text-slate-500"
             }`}
           >
             {g}

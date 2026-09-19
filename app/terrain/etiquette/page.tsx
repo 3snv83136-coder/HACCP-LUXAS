@@ -48,7 +48,7 @@ export default function EtiquettePage() {
 
   return (
     <div className="space-y-4 pb-10">
-      <h1 className="text-2xl font-semibold text-white">Étiquette DLC secondaire</h1>
+      <h1 className="text-2xl font-semibold text-slate-900">Étiquette DLC secondaire</h1>
       <div className="grid grid-cols-3 gap-2">
         {(
           [
@@ -62,7 +62,7 @@ export default function EtiquettePage() {
             type="button"
             onClick={() => setKind(id)}
             className={`rounded-2xl border py-3 text-xs font-semibold ${
-              kind === id ? "border-teal-400 bg-teal-400/10 text-white" : "border-white/10 text-white/50"
+              kind === id ? "border-teal-500 bg-teal-50 text-slate-900" : "border-slate-200 text-slate-500"
             }`}
           >
             {label}
@@ -82,7 +82,7 @@ export default function EtiquettePage() {
       </Button>
 
       {preview && qrUrl ? (
-        <div className="rounded-3xl border border-white/10 bg-white p-5 text-center text-slate-900">
+        <div className="rounded-3xl border border-slate-200 bg-white p-5 text-center text-slate-900 shadow-sm">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={qrUrl} alt={`QR étiquette ${preview.produit}`} className="mx-auto h-40 w-40" />
           <p className="mt-2 text-lg font-bold">{preview.produit}</p>
