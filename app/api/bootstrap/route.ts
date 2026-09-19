@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { getBootstrap } from "@/lib/server/bootstrap";
 
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   try {

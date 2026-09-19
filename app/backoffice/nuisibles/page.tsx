@@ -1,5 +1,8 @@
 import { prisma } from "@/lib/db";
 
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
+
 export default async function NuisiblesPage() {
   const passages = await prisma.nuisiblesPassage.findMany({
     include: { etablissement: true },

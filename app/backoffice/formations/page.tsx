@@ -1,5 +1,8 @@
 import { prisma } from "@/lib/db";
 
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
+
 export default async function FormationsPage() {
   const formations = await prisma.formation.findMany({
     include: { membre: { include: { utilisateur: true, etablissement: true } } },

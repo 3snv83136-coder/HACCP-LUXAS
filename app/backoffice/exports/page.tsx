@@ -3,6 +3,9 @@ import { formatDateHeure, formatTemp } from "@/lib/utils";
 import { PrintButton } from "@/components/backoffice/print-button";
 import { PdfDownloadButton } from "@/components/backoffice/pdf-download";
 
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
+
 export default async function ExportsPage() {
   const etab = await prisma.etablissement.findFirst();
   const depuis = new Date();

@@ -5,6 +5,9 @@ import { genererDossierSanitaire } from "@/lib/server/pdf";
 import { prisma, writeAudit } from "@/lib/db";
 import { resolveEtablissement } from "@/lib/server/etab";
 
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const etab = await resolveEtablissement(searchParams.get("etablissementId"));
@@ -14,10 +17,11 @@ export async function GET(request: Request) {
   depuis.setDate(depuis.getDate() - (Number.isFinite(jours) ? jours : 7));
   const bytes = await genererDossierSanitaire(etab.id, depuis);
 
-  const dir = path.join(process.cwd(), "public", "archives");
-  await mkdir(dir, { recursive: true });
   const filename = `dossier-${etab.id}-${depuis.toISOString().slice(0, 10)}.pdf`;
+  const dir = process.env.VERCEL ? "/tmp" : path.join(process.cwd(), "public", "archives");
+  await mkdir(dir, { recursive: true });
   await writeFile(path.join(dir, filename), bytes);
+  const fichierUrl = process.env.VERCEL ? "" : `/archives/${filename}`;
 
   await prisma.documentPms.create({
     data: {
@@ -25,7 +29,7 @@ export async function GET(request: Request) {
       titre: `Dossier sanitaire ${depuis.toLocaleDateString("fr-FR")}`,
       categorie: "export_ddpp",
       version: new Date().toISOString().slice(0, 10),
-      fichierUrl: `/archives/${filename}`,
+      fichierUrl,
     },
   });
   await writeAudit({

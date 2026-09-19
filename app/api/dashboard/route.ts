@@ -6,6 +6,9 @@ import { listEtablissements, resolveEtablissement } from "@/lib/server/etab";
 import { prisma } from "@/lib/db";
 import { startOfDay } from "@/lib/utils";
 
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const etabs = await listEtablissements();

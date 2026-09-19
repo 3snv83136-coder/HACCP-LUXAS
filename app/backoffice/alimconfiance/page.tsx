@@ -1,5 +1,8 @@
 import { prisma } from "@/lib/db";
 
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
+
 export default async function AlimConfiancePage() {
   const date = (await prisma.parametre.findFirst({ where: { cle: "ALIMCONFIANCE_DATE" } }))?.valeur ?? "";
   const resultat =

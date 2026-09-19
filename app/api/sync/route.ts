@@ -2,6 +2,9 @@ import { NextResponse } from "next/server";
 import { applyQueueItem } from "@/lib/server/apply-sync";
 import type { QueueItem } from "@/lib/types";
 
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
+
 export async function POST(request: Request) {
   const body = (await request.json()) as { items?: QueueItem[] };
   const items = body.items ?? [];

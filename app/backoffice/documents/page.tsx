@@ -1,5 +1,8 @@
 import { prisma } from "@/lib/db";
 
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
+
 export default async function DocumentsPage() {
   const docs = await prisma.documentPms.findMany({ orderBy: { createdAt: "desc" } });
   const formations = await prisma.formation.findMany({
