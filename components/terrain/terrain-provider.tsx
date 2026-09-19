@@ -25,6 +25,7 @@ import { NumericPad } from "@/components/terrain/numeric-pad";
 import { Button } from "@/components/ui/button";
 import { SyncPill } from "@/components/terrain/sync-pill";
 import { BackArrow } from "@/components/navigation/back-arrow";
+import { BrandLogo } from "@/components/brand/logo";
 
 type TerrainContextValue = {
   session: SessionOperateur;
@@ -167,8 +168,9 @@ export function TerrainProvider({ children }: { children: ReactNode }) {
       <div className="mx-auto flex min-h-dvh max-w-md flex-col justify-between px-5 py-8">
         <div>
           <BackArrow />
+          <BrandLogo size={120} className="mt-6 rounded-3xl" />
           <p className="mt-6 text-xs font-semibold uppercase tracking-[0.22em] text-teal-700">
-            Sanitrace · terrain
+            Le Zinc Bouillon · terrain
           </p>
           <h1 className="mt-3 text-3xl font-semibold tracking-tight text-slate-900">Ton code</h1>
           <p className="mt-2 text-sm text-slate-500">
@@ -211,8 +213,9 @@ export function TerrainProvider({ children }: { children: ReactNode }) {
         <header className="sticky top-0 z-20 flex items-center justify-between gap-3 border-b border-slate-200 bg-white/90 px-4 py-3 backdrop-blur">
           <div className="flex min-w-0 items-center gap-3">
             <BackArrow />
+            <BrandLogo size={40} className="rounded-xl" />
             <div className="min-w-0">
-              <p className="text-[11px] uppercase tracking-[0.18em] text-teal-700">Sanitrace</p>
+              <p className="text-[11px] uppercase tracking-[0.18em] text-teal-700">Le Zinc Bouillon</p>
               <p className="truncate text-sm font-medium text-slate-900">
                 {session.prenom} · {session.etablissementNom}
               </p>

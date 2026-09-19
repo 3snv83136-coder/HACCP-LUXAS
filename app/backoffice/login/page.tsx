@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import { Button } from "@/components/ui/button";
 import { BackArrow } from "@/components/navigation/back-arrow";
+import { BrandLogo } from "@/components/brand/logo";
 
 function LoginForm() {
   const router = useRouter();
@@ -40,7 +41,8 @@ function LoginForm() {
   return (
     <form onSubmit={(e) => void onSubmit(e)} className="mx-auto flex min-h-dvh max-w-md flex-col justify-center px-6">
       <BackArrow />
-      <p className="mt-6 text-xs font-semibold uppercase tracking-[0.22em] text-teal-700">Sanitrace</p>
+      <BrandLogo size={120} className="mt-6 rounded-3xl" />
+      <p className="mt-6 text-xs font-semibold uppercase tracking-[0.22em] text-teal-700">Le Zinc Bouillon</p>
       <h1 className="mt-3 text-3xl font-semibold text-slate-900">Back-office</h1>
       <p className="mt-2 text-sm text-slate-500">Code responsable ou gérant, 4 chiffres.</p>
       <input

@@ -16,15 +16,15 @@ const mono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Sanitrace — Contrôle sanitaire HACCP",
+  title: "Le Zinc Bouillon — Contrôle sanitaire HACCP",
   description:
-    "Relevés de températures, ménage, traçabilité et dossier sanitaire pour cuisines professionnelles.",
-  applicationName: "Sanitrace",
+    "Relevés de températures, ménage, traçabilité et dossier sanitaire pour Le Zinc Bouillon.",
+  applicationName: "Le Zinc Bouillon",
   manifest: "/manifest.json",
-  icons: { icon: "/icon.svg", apple: "/icon.svg" },
+  icons: { icon: "/logo-le-zinc-bouillon.png", apple: "/logo-le-zinc-bouillon.png" },
   appleWebApp: {
     capable: true,
-    title: "Sanitrace",
+    title: "Le Zinc Bouillon",
     statusBarStyle: "default",
   },
 };

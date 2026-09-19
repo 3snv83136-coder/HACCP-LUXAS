@@ -1,6 +1,6 @@
 {
-  "name": "Sanitrace",
-  "short_name": "Sanitrace",
+  "name": "Le Zinc Bouillon",
+  "short_name": "Zinc Bouillon",
   "description": "Contrôle sanitaire HACCP — relevés, ménage, traçabilité.",
   "start_url": "/terrain",
   "display": "standalone",
@@ -9,9 +9,9 @@
   "lang": "fr",
   "icons": [
     {
-      "src": "/icon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
+      "src": "/logo-le-zinc-bouillon.png",
+      "sizes": "512x512",
+      "type": "image/png",
       "purpose": "any"
     }
   ]

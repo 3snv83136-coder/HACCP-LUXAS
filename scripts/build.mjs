@@ -1,9 +1,15 @@
 import { spawnSync } from "node:child_process";
 
-const url = process.env.DATABASE_URL?.trim() ?? "";
-if (!url.startsWith("postgres")) {
-  console.error("DATABASE_URL Postgres est requis pour le build (Supabase/Neon).");
-  process.exit(1);
+const BUILD_PLACEHOLDER = "postgresql://build:build@127.0.0.1:5432/build";
+
+const raw = process.env.DATABASE_URL?.trim() ?? "";
+const isPostgres = raw.startsWith("postgres");
+
+if (!isPostgres) {
+  process.env.DATABASE_URL = BUILD_PLACEHOLDER;
+  console.warn(
+    "DATABASE_URL Postgres absent au build : prisma generate + next build seulement.",
+  );
 }
 
 function run(command, args) {
@@ -18,6 +24,8 @@ function run(command, args) {
 }
 
 run("npx", ["prisma", "generate"]);
-run("npx", ["prisma", "db", "push"]);
-run("npx", ["prisma", "db", "seed"]);
+if (isPostgres) {
+  run("npx", ["prisma", "db", "push"]);
+  run("npx", ["prisma", "db", "seed"]);
+}
 run("npx", ["next", "build"]);

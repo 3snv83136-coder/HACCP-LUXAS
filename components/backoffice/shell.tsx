@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { BackArrow } from "@/components/navigation/back-arrow";
+import { BrandLogo } from "@/components/brand/logo";
 
 const nav = [
   { href: "/backoffice", label: "Dashboard", icon: LayoutDashboard },
@@ -49,7 +50,8 @@ export function BackofficeShell({ children }: { children: React.ReactNode }) {
       <div className="flex min-h-dvh">
         <aside className="hidden w-64 shrink-0 border-r border-slate-200 bg-white p-5 text-slate-900 lg:block">
           <Link href="/" className="block">
-            <p className="text-[11px] uppercase tracking-[0.22em] text-teal-700">Sanitrace</p>
+            <BrandLogo size={72} className="rounded-2xl" />
+            <p className="mt-3 text-[11px] uppercase tracking-[0.22em] text-teal-700">Le Zinc Bouillon</p>
             <p className="mt-1 text-lg font-semibold">Back-office</p>
           </Link>
           <nav className="mt-8 space-y-1">
@@ -72,7 +74,8 @@ export function BackofficeShell({ children }: { children: React.ReactNode }) {
           <header className="sticky top-0 z-10 flex items-center justify-between border-b border-slate-200 bg-white/90 px-4 py-3 backdrop-blur md:px-8">
             <div className="flex min-w-0 items-center gap-3">
               <BackArrow />
-              <p className="font-semibold">Luxas — multi-établissement</p>
+              <BrandLogo size={36} className="rounded-lg" />
+              <p className="font-semibold">Le Zinc Bouillon</p>
             </div>
             <button type="button" onClick={() => void logout()} className="text-sm text-slate-500">
               Quitter
