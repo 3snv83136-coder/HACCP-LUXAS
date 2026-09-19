@@ -59,7 +59,7 @@ export default async function ExportsPage() {
           {archives.length === 0 ? <li className="text-sm text-slate-500">Aucun export encore.</li> : null}
           {archives.map((a) => (
             <li key={a.id}>
-              <a href={a.fichierUrl ?? "#"} className="text-teal-800 underline">
+              <a href={a.fichierUrl ? `/api/documents/${a.id}` : "#"} className="text-teal-800 underline">
                 {a.titre} · v{a.version}
               </a>
             </li>

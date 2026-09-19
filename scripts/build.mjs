@@ -1,9 +1,10 @@
 import { spawnSync } from "node:child_process";
 
-process.env.DATABASE_URL =
-  process.env.DATABASE_URL && process.env.DATABASE_URL.trim() !== ""
-    ? process.env.DATABASE_URL
-    : "file:./dev.db";
+const url = process.env.DATABASE_URL?.trim() ?? "";
+if (!url.startsWith("postgres")) {
+  console.error("DATABASE_URL Postgres est requis pour le build (Supabase/Neon).");
+  process.exit(1);
+}
 
 function run(command, args) {
   const result = spawnSync(command, args, {

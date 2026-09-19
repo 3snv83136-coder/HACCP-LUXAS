@@ -23,7 +23,7 @@ export default function HomePage() {
           <ChefHat className="h-8 w-8 text-teal-700" />
           <h2 className="mt-4 text-2xl font-semibold text-slate-900">Terrain</h2>
           <p className="mt-2 text-sm text-slate-500">
-            Tablette cuisine. Scan QR, relevé T°, ménage, réception — mode entraînement sans code.
+            Tablette cuisine. Scan QR, relevé T°, ménage, réception — code personnel pour signer.
           </p>
           <span className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-teal-700">
             Ouvrir l’app opérateur <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />

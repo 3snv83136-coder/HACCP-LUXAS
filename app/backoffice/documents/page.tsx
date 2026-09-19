@@ -18,9 +18,9 @@ export default async function DocumentsPage() {
           {docs.map((d) => (
             <li key={d.id} className="rounded-2xl border border-slate-100 px-4 py-3">
               <p className="font-medium">{d.titre}</p>
-              <p className="text-sm text-slate-500">
+              <a href={d.fichierUrl ? `/api/documents/${d.id}` : undefined} className="text-sm text-teal-800 underline">
                 {d.categorie} · v{d.version}
-              </p>
+              </a>
             </li>
           ))}
         </ul>

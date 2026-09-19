@@ -1,6 +1,4 @@
 import { NextResponse } from "next/server";
-import { mkdir, writeFile } from "node:fs/promises";
-import path from "node:path";
 import { genererDossierSanitaire } from "@/lib/server/pdf";
 import { prisma, writeAudit } from "@/lib/db";
 import { resolveEtablissement } from "@/lib/server/etab";
@@ -16,12 +14,8 @@ export async function GET(request: Request) {
   const depuis = new Date();
   depuis.setDate(depuis.getDate() - (Number.isFinite(jours) ? jours : 7));
   const bytes = await genererDossierSanitaire(etab.id, depuis);
-
   const filename = `dossier-${etab.id}-${depuis.toISOString().slice(0, 10)}.pdf`;
-  const dir = process.env.VERCEL ? "/tmp" : path.join(process.cwd(), "public", "archives");
-  await mkdir(dir, { recursive: true });
-  await writeFile(path.join(dir, filename), bytes);
-  const fichierUrl = process.env.VERCEL ? "" : `/archives/${filename}`;
+  const fichierUrl = `data:application/pdf;base64,${Buffer.from(bytes).toString("base64")}`;
 
   await prisma.documentPms.create({
     data: {

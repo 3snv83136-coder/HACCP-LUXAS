@@ -5,6 +5,14 @@ import { PARAM_KEYS, SEED_PARAMETRES } from "../lib/params";
 const prisma = new PrismaClient();
 
 async function main() {
+  if (process.env.FORCE_SEED !== "1") {
+    const existing = await prisma.organisation.findFirst();
+    if (existing) {
+      console.log("Seed ignoré — données déjà présentes (FORCE_SEED=1 pour réinitialiser).");
+      return;
+    }
+  }
+
   await prisma.alerte.deleteMany();
   await prisma.auditLog.deleteMany();
   await prisma.nonConformite.deleteMany();
@@ -99,6 +107,12 @@ async function main() {
     data: {
       membreEtablissementId: membreSophie.id,
       codeHash: await bcrypt.hash("1470", 10),
+    },
+  });
+  await prisma.codeOperateur.create({
+    data: {
+      membreEtablissementId: membreGerant.id,
+      codeHash: await bcrypt.hash("3690", 10),
     },
   });
 
@@ -447,7 +461,7 @@ async function main() {
         etablissement: etab.nom,
         second: nice.nom,
         gerantMembre: membreGerant.id,
-        codesDemo: { operateur: "2580", responsable: "1470" },
+        codesDemo: { operateur: "2580", responsable: "1470", gerant: "3690" },
         ouvertureId: ouverture.id,
         taches: taches.length,
       }),
@@ -455,7 +469,7 @@ async function main() {
   });
 
   console.log("Seed OK — Cuisine Luxas");
-  console.log("Codes terrain : opérateur 2580 · responsable 1470");
+  console.log("Codes : opérateur 2580 · responsable 1470 · gérant 3690");
 }
 
 main()

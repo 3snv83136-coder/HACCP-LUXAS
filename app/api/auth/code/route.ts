@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { verifyCode } from "@/lib/crypto";
+import { SESSION_COOKIE, signSession } from "@/lib/auth/session";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -14,7 +15,7 @@ export async function POST(request: Request) {
 
   const etab = body.etablissementId
     ? await prisma.etablissement.findUnique({ where: { id: body.etablissementId } })
-    : await prisma.etablissement.findFirst();
+    : await prisma.etablissement.findFirst({ orderBy: { createdAt: "asc" } });
 
   if (!etab) {
     return NextResponse.json({ error: "Établissement introuvable" }, { status: 404 });
@@ -31,20 +32,36 @@ export async function POST(request: Request) {
   for (const row of codes) {
     if (await verifyCode(code, row.codeHash)) {
       const u = row.membre.utilisateur;
-      return NextResponse.json({
-        session: {
-          etablissementId: etab.id,
-          etablissementNom: etab.nom,
-          organisationId: etab.organisationId,
-          membreId: row.membre.id,
-          utilisateurId: u.id,
-          codeOperateurId: row.id,
-          nom: u.nom,
-          prenom: u.prenom,
-          role: row.membre.role,
-          signedAt: new Date().toISOString(),
-        },
+      const session = {
+        etablissementId: etab.id,
+        etablissementNom: etab.nom,
+        organisationId: etab.organisationId,
+        membreId: row.membre.id,
+        utilisateurId: u.id,
+        codeOperateurId: row.id,
+        nom: u.nom,
+        prenom: u.prenom,
+        role: row.membre.role,
+        signedAt: new Date().toISOString(),
+      };
+      const token = await signSession({
+        membreId: row.membre.id,
+        utilisateurId: u.id,
+        codeOperateurId: row.id,
+        etablissementId: etab.id,
+        role: row.membre.role,
+        prenom: u.prenom,
+        nom: u.nom,
       });
+      const res = NextResponse.json({ session });
+      res.cookies.set(SESSION_COOKIE, token, {
+        httpOnly: true,
+        sameSite: "lax",
+        secure: process.env.VERCEL === "1",
+        path: "/",
+        maxAge: 60 * 60 * 12,
+      });
+      return res;
     }
   }
 

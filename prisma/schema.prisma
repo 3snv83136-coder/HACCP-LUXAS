@@ -1,10 +1,12 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  schemas  = ["haccp"]
 }
 
 model Organisation {
@@ -18,6 +20,7 @@ model Organisation {
   parametres     Parametre[]
 
   @@map("organisation")
+  @@schema("haccp")
 }
 
 model Etablissement {
@@ -51,6 +54,7 @@ model Etablissement {
 
   @@index([organisationId])
   @@map("etablissement")
+  @@schema("haccp")
 }
 
 model Utilisateur {
@@ -68,6 +72,7 @@ model Utilisateur {
 
   @@index([organisationId])
   @@map("utilisateur")
+  @@schema("haccp")
 }
 
 model MembreEtablissement {
@@ -87,6 +92,7 @@ model MembreEtablissement {
   @@unique([utilisateurId, etablissementId])
   @@index([etablissementId, role])
   @@map("membre_etablissement")
+  @@schema("haccp")
 }
 
 model CodeOperateur {
@@ -105,6 +111,7 @@ model CodeOperateur {
 
   @@index([membreEtablissementId])
   @@map("code_operateur")
+  @@schema("haccp")
 }
 
 model Equipement {
@@ -123,6 +130,7 @@ model Equipement {
 
   @@index([etablissementId, actif])
   @@map("equipement")
+  @@schema("haccp")
 }
 
 model PointControle {
@@ -140,6 +148,7 @@ model PointControle {
 
   @@index([etablissementId])
   @@map("point_controle")
+  @@schema("haccp")
 }
 
 model PlanFrequence {
@@ -155,6 +164,7 @@ model PlanFrequence {
 
   @@index([etablissementId, cibleType, cibleId])
   @@map("plan_frequence")
+  @@schema("haccp")
 }
 
 model ReleveTemperature {
@@ -182,6 +192,7 @@ model ReleveTemperature {
   @@index([etablissementId, createdAt])
   @@index([equipementId, createdAt])
   @@map("releve_temperature")
+  @@schema("haccp")
 }
 
 model Reception {
@@ -206,6 +217,7 @@ model Reception {
 
   @@index([etablissementId, createdAt])
   @@map("reception")
+  @@schema("haccp")
 }
 
 model LotProduit {
@@ -224,6 +236,7 @@ model LotProduit {
 
   @@index([etablissementId, dlcSecondaire])
   @@map("lot_produit")
+  @@schema("haccp")
 }
 
 model PlatTemoin {
@@ -242,6 +255,7 @@ model PlatTemoin {
 
   @@index([etablissementId, destructionPrevue])
   @@map("plat_temoin")
+  @@schema("haccp")
 }
 
 model ProduitNettoyage {
@@ -258,6 +272,7 @@ model ProduitNettoyage {
 
   @@index([etablissementId])
   @@map("produit_nettoyage")
+  @@schema("haccp")
 }
 
 model TacheNettoyage {
@@ -276,6 +291,7 @@ model TacheNettoyage {
 
   @@index([etablissementId, actif])
   @@map("tache_nettoyage")
+  @@schema("haccp")
 }
 
 model ExecutionNettoyage {
@@ -294,6 +310,7 @@ model ExecutionNettoyage {
 
   @@index([etablissementId, faitAt])
   @@map("execution_nettoyage")
+  @@schema("haccp")
 }
 
 model Checklist {
@@ -309,6 +326,7 @@ model Checklist {
 
   @@index([etablissementId])
   @@map("checklist")
+  @@schema("haccp")
 }
 
 model ChecklistItem {
@@ -320,6 +338,7 @@ model ChecklistItem {
   checklist Checklist @relation(fields: [checklistId], references: [id], onDelete: Cascade)
 
   @@map("checklist_item")
+  @@schema("haccp")
 }
 
 model ChecklistExecution {
@@ -334,6 +353,7 @@ model ChecklistExecution {
   codeOperateur CodeOperateur @relation(fields: [codeOperateurId], references: [id], onDelete: Restrict)
 
   @@map("checklist_execution")
+  @@schema("haccp")
 }
 
 model HuileFriture {
@@ -346,6 +366,7 @@ model HuileFriture {
   releves       ReleveHuile[]
 
   @@map("huile_friture")
+  @@schema("haccp")
 }
 
 model ReleveHuile {
@@ -361,6 +382,7 @@ model ReleveHuile {
   codeOperateur CodeOperateur @relation(fields: [codeOperateurId], references: [id], onDelete: Restrict)
 
   @@map("releve_huile")
+  @@schema("haccp")
 }
 
 model NuisiblesPassage {
@@ -374,6 +396,7 @@ model NuisiblesPassage {
   etablissement Etablissement @relation(fields: [etablissementId], references: [id], onDelete: Restrict)
 
   @@map("nuisibles_passage")
+  @@schema("haccp")
 }
 
 model Formation {
@@ -387,6 +410,7 @@ model Formation {
   membre MembreEtablissement @relation(fields: [membreEtablissementId], references: [id], onDelete: Restrict)
 
   @@map("formation")
+  @@schema("haccp")
 }
 
 model NonConformite {
@@ -413,6 +437,7 @@ model NonConformite {
 
   @@index([etablissementId, statut])
   @@map("non_conformite")
+  @@schema("haccp")
 }
 
 model DocumentPms {
@@ -427,6 +452,7 @@ model DocumentPms {
   etablissement Etablissement @relation(fields: [etablissementId], references: [id], onDelete: Restrict)
 
   @@map("document_pms")
+  @@schema("haccp")
 }
 
 model Parametre {
@@ -439,6 +465,7 @@ model Parametre {
 
   @@unique([organisationId, cle])
   @@map("parametre")
+  @@schema("haccp")
 }
 
 model Alerte {
@@ -454,6 +481,7 @@ model Alerte {
 
   @@index([etablissementId, createdAt])
   @@map("alerte")
+  @@schema("haccp")
 }
 
 model AuditLog {
@@ -469,4 +497,5 @@ model AuditLog {
 
   @@index([etablissementId, createdAt])
   @@map("audit_log")
+  @@schema("haccp")
 }
