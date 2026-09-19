@@ -94,7 +94,7 @@ export default function HygienePage() {
   }, [periode]);
 
   return (
-    <div className="space-y-6 pb-16 print:pb-0">
+    <div className="space-y-6 pb-24 lg:pb-16 print:pb-0">
       <div className="flex flex-wrap items-end justify-between gap-4 print:hidden">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-teal-700">
@@ -119,14 +119,14 @@ export default function HygienePage() {
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center gap-3 rounded-3xl border border-slate-200 bg-white p-4 print:hidden">
+      <div className="flex flex-col gap-3 rounded-3xl border border-slate-200 bg-white p-3 sm:p-4 print:hidden">
         <div className="flex rounded-2xl bg-slate-100 p-1">
           {periodes.map((p) => (
             <button
               key={p.id}
               type="button"
               onClick={() => setPeriode(p.id)}
-              className={`rounded-xl px-4 py-2 text-sm font-semibold ${
+              className={`flex-1 rounded-xl px-2 py-2.5 text-sm font-semibold sm:px-4 ${
                 periode === p.id ? "bg-white text-slate-900 shadow-sm" : "text-slate-500"
               }`}
             >
@@ -140,7 +140,7 @@ export default function HygienePage() {
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
-            className="h-11 rounded-2xl border border-slate-200 px-3"
+            className="h-11 min-w-0 flex-1 rounded-2xl border border-slate-200 px-3"
           />
         </label>
       </div>

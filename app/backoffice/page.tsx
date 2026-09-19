@@ -56,17 +56,17 @@ export default function DashboardPage() {
   ];
 
   return (
-    <div className="space-y-6 pb-16">
+    <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-teal-700">Temps réel</p>
-          <h1 className="mt-1 text-3xl font-semibold tracking-tight">{data.etablissement.nom}</h1>
+          <h1 className="mt-1 text-2xl font-semibold tracking-tight sm:text-3xl">{data.etablissement.nom}</h1>
           <p className="text-slate-500">
             {data.compteurs.receptionsToday} réceptions · {data.compteurs.alertes} alertes
           </p>
         </div>
         <select
-          className="h-11 rounded-2xl border border-slate-200 bg-white px-3"
+          className="h-11 w-full rounded-2xl border border-slate-200 bg-white px-3 sm:w-auto"
           value={etabId}
           onChange={(e) => setEtabId(e.target.value)}
           aria-label="Établissement"
@@ -77,6 +77,25 @@ export default function DashboardPage() {
             </option>
           ))}
         </select>
+      </div>
+
+      <div className="grid gap-3 sm:grid-cols-2">
+        <Link
+          href="/backoffice/personnel"
+          className="rounded-3xl border border-slate-200 bg-white p-5 hover:border-teal-300"
+        >
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-teal-700">Équipe</p>
+          <p className="mt-1 text-lg font-semibold">Salariés & accès</p>
+          <p className="mt-1 text-sm text-slate-500">Ajouter un salarié, un gérant ou un code back-office.</p>
+        </Link>
+        <Link
+          href="/backoffice/produits"
+          className="rounded-3xl border border-slate-200 bg-white p-5 hover:border-teal-300"
+        >
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-teal-700">Traçabilité</p>
+          <p className="mt-1 text-lg font-semibold">Produits</p>
+          <p className="mt-1 text-sm text-slate-500">Réceptions et lots filtrés par jour, semaine ou mois.</p>
+        </Link>
       </div>
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">

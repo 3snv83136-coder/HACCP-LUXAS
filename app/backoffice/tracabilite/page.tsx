@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/db";
+import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -12,11 +13,17 @@ export default async function TracabilitePage() {
   const now = new Date();
 
   return (
-    <div className="space-y-5 pb-16">
-      <h1 className="text-3xl font-semibold">Traçabilité lots & DLC secondaires</h1>
-      <p className="text-slate-500">Registre entrée → transformation → étiquette. Base d’un retrait/rappel.</p>
-      <div className="overflow-hidden rounded-3xl bg-white shadow-sm">
-        <table className="w-full text-left text-sm">
+    <div className="space-y-5">
+      <h1 className="text-2xl font-semibold sm:text-3xl">Traçabilité lots & DLC secondaires</h1>
+      <p className="text-slate-500">
+        Registre entrée → transformation → étiquette. Vue filtrée jour / semaine / mois dans{" "}
+        <Link href="/backoffice/produits" className="text-teal-700">
+          Produits
+        </Link>
+        .
+      </p>
+      <div className="overflow-x-auto rounded-3xl bg-white shadow-sm">
+        <table className="w-full min-w-[40rem] text-left text-sm">
           <thead>
             <tr className="bg-slate-50 text-slate-500">
               <th className="px-4 py-3">Produit</th>
