@@ -5,7 +5,6 @@ import { PhotoCapture } from "@/components/terrain/photo-capture";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 
 type Capture = {
