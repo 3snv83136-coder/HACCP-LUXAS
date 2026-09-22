@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { createurDepuisRequete } from "@/lib/server/createur-request";
+import { supprimerEtablissement } from "@/lib/server/supprimer-etablissement";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -68,4 +69,22 @@ export async function PATCH(request: Request) {
     select: { id: true, nom: true, actif: true },
   });
   return NextResponse.json({ ok: true, etablissement: etab });
+}
+
+export async function DELETE(request: Request) {
+  const createur = await createurDepuisRequete(request);
+  if (!createur) return NextResponse.json({ error: "Non connecté" }, { status: 401 });
+
+  const body = (await request.json()) as { id?: string };
+  if (!body.id) return NextResponse.json({ error: "id requis" }, { status: 400 });
+
+  try {
+    const resultat = await supprimerEtablissement(body.id);
+    if (!resultat.ok) {
+      return NextResponse.json({ error: resultat.error }, { status: 404 });
+    }
+    return NextResponse.json({ ok: true, nom: resultat.nom });
+  } catch {
+    return NextResponse.json({ error: "Suppression impossible" }, { status: 500 });
+  }
 }
