@@ -94,7 +94,7 @@ export async function getBootstrap(etablissementId?: string): Promise<BootstrapP
 
   return {
     organisationId: etab.organisationId,
-    etablissement: { id: etab.id, nom: etab.nom, adresse: etab.adresse },
+    etablissement: { id: etab.id, nom: etab.nom, adresse: etab.adresse, logoUrl: etab.logoUrl },
     params,
     equipements: equipements.map((e) => {
       const plan = planByCible.get(`equipement:${e.id}`);

@@ -16,6 +16,7 @@ export type QueueKind =
 export type SessionOperateur = {
   etablissementId: string;
   etablissementNom: string;
+  logoUrl?: string | null;
   organisationId: string;
   membreId: string;
   utilisateurId: string;
@@ -115,7 +116,7 @@ export type QueueItem = {
 
 export type BootstrapPayload = {
   organisationId: string;
-  etablissement: { id: string; nom: string; adresse: string | null };
+  etablissement: { id: string; nom: string; adresse: string | null; logoUrl: string | null };
   params: Record<string, string>;
   equipements: EquipementRef[];
   pointsControle: PointControleRef[];

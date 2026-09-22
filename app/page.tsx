@@ -38,12 +38,20 @@ export default function HomePage() {
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-teal-700">Sanitrace</p>
             <p className="mt-1 text-sm text-slate-500">Plan de maîtrise sanitaire</p>
           </div>
-          <Link
-            href="/creer-compte"
-            className="inline-flex h-11 items-center rounded-full bg-slate-900 px-5 text-sm font-semibold text-white"
-          >
-            Créer le compte de mon établissement
-          </Link>
+          <div className="flex flex-wrap items-center gap-2">
+            <Link
+              href="/connexion"
+              className="inline-flex h-11 items-center rounded-full border border-slate-200 bg-white px-5 text-sm font-semibold text-slate-900"
+            >
+              Se connecter
+            </Link>
+            <Link
+              href="/creer-compte"
+              className="inline-flex h-11 items-center rounded-full bg-slate-900 px-5 text-sm font-semibold text-white"
+            >
+              Créer le compte
+            </Link>
+          </div>
         </header>
 
         <section className="mt-16 max-w-2xl">
@@ -76,6 +84,12 @@ export default function HomePage() {
             </Link>
           ))}
         </div>
+
+        <footer className="mt-auto pt-16 text-xs text-slate-400">
+          <Link href="/createurs/connexion" className="hover:text-slate-600">
+            Espace créateurs
+          </Link>
+        </footer>
       </div>
     </main>
   );

@@ -5,6 +5,22 @@ import { PARAM_KEYS, SEED_PARAMETRES } from "../lib/params";
 const prisma = new PrismaClient();
 
 async function main() {
+  const creatorEmail = (process.env.CREATOR_EMAIL ?? "").trim().toLowerCase();
+  const creatorPassword = process.env.CREATOR_PASSWORD ?? "";
+  if (creatorEmail && creatorPassword.length >= 8) {
+    await prisma.comptePlateforme.upsert({
+      where: { email: creatorEmail },
+      update: { motDePasseHash: await bcrypt.hash(creatorPassword, 10), actif: true },
+      create: {
+        email: creatorEmail,
+        motDePasseHash: await bcrypt.hash(creatorPassword, 10),
+        prenom: "Équipe",
+        nom: "Sanitrace",
+      },
+    });
+    console.log(`Créateur plateforme : ${creatorEmail}`);
+  }
+
   if (process.env.FORCE_SEED !== "1") {
     const existing = await prisma.organisation.findFirst();
     if (existing) {
@@ -50,9 +66,10 @@ async function main() {
   const etab = await prisma.etablissement.create({
     data: {
       organisationId: org.id,
-      nom: "Cuisine Luxas",
+      nom: "Le Zinc Bouillon",
       adresse: "À paramétrer",
       email: "gerant@luxas.local",
+      logoUrl: "/logo-le-zinc-bouillon.png",
       slug: "luxas",
       typeCuisine: "restauration_commerciale",
     },
@@ -473,7 +490,7 @@ async function main() {
     },
   });
 
-  console.log("Seed OK — Cuisine Luxas");
+  console.log("Seed OK — Le Zinc Bouillon (Luxas)");
   console.log("Codes : opérateur 2580 · responsable 1470 · gérant 3690");
 }
 

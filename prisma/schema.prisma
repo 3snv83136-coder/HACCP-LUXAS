@@ -70,6 +70,7 @@ model Utilisateur {
   nom            String
   prenom         String
   email          String?
+  motDePasseHash String?  @map("mot_de_passe_hash")
   actif          Boolean  @default(true)
   createdAt      DateTime @default(now()) @map("created_at")
 
@@ -77,6 +78,7 @@ model Utilisateur {
   membres      MembreEtablissement[]
 
   @@index([organisationId])
+  @@index([email])
   @@map("utilisateur")
   @@schema("haccp")
 }
@@ -543,5 +545,18 @@ model Impression {
 
   @@index([etablissementId, statut, createdAt])
   @@map("impression")
+  @@schema("haccp")
+}
+
+model ComptePlateforme {
+  id             String   @id @default(cuid())
+  email          String   @unique
+  motDePasseHash String   @map("mot_de_passe_hash")
+  prenom         String
+  nom            String
+  actif          Boolean  @default(true)
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  @@map("compte_plateforme")
   @@schema("haccp")
 }

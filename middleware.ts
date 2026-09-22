@@ -1,12 +1,27 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { readSession, SESSION_COOKIE } from "@/lib/auth/session";
+import { CREATEUR_COOKIE, readCreateur } from "@/lib/auth/createur";
 
 const BACKOFFICE_ROLES = new Set(["responsable", "gerant"]);
+
+function isCreateurPublic(pathname: string) {
+  return (
+    pathname === "/createurs/connexion" ||
+    pathname === "/api/createurs/connexion" ||
+    pathname === "/api/createurs/statut" ||
+    pathname === "/api/createurs/logout"
+  );
+}
+
+function isCreateurZone(pathname: string) {
+  return pathname === "/createurs" || pathname.startsWith("/createurs/") || pathname.startsWith("/api/createurs");
+}
 
 function isProtectedPage(pathname: string) {
   if (pathname === "/backoffice/login") return false;
   if (pathname.startsWith("/acces/")) return false;
+  if (pathname === "/connexion") return false;
   return (
     pathname === "/backoffice" ||
     pathname.startsWith("/backoffice/") ||
@@ -37,6 +52,19 @@ function isProtectedApi(pathname: string) {
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  if (isCreateurZone(pathname)) {
+    if (isCreateurPublic(pathname)) return NextResponse.next();
+    const createur = await readCreateur(request.cookies.get(CREATEUR_COOKIE)?.value);
+    if (createur) return NextResponse.next();
+    if (pathname.startsWith("/api/")) {
+      return NextResponse.json({ error: "Connexion créateur requise" }, { status: 401 });
+    }
+    const login = new URL("/createurs/connexion", request.url);
+    login.searchParams.set("next", pathname);
+    return NextResponse.redirect(login);
+  }
+
   if (!isProtectedPage(pathname) && !isProtectedApi(pathname)) {
     return NextResponse.next();
   }
@@ -52,7 +80,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.json({ error: "Connexion administrateur requise" }, { status: 401 });
   }
 
-  const loginPath = pathname.startsWith("/hygiene") ? "/acces/hygiene" : "/acces/administrateur";
+  const loginPath = pathname.startsWith("/hygiene") ? "/acces/hygiene" : "/connexion";
   const login = new URL(loginPath, request.url);
   login.searchParams.set("next", pathname);
   return NextResponse.redirect(login);
@@ -66,6 +94,8 @@ export const config = {
     "/hygiene/:path*",
     "/station-impression",
     "/station-impression/:path*",
+    "/createurs",
+    "/createurs/:path*",
     "/api/:path*",
   ],
 };

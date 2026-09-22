@@ -23,7 +23,8 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { BackArrow } from "@/components/navigation/back-arrow";
-import { BrandLogo } from "@/components/brand/logo";
+import { BrandLogo, SanitraceNom } from "@/components/brand/logo";
+import { useEtablissementCourant } from "@/components/brand/use-etablissement";
 
 const nav = [
   { href: "/backoffice", label: "Dashboard", icon: LayoutDashboard },
@@ -58,6 +59,8 @@ export function BackofficeShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
+  const compte = useEtablissementCourant();
+  const nomEtablissement = compte?.nom ?? "Back-office";
 
   useEffect(() => {
     document.body.style.overflow = menuOpen ? "hidden" : "";
@@ -72,7 +75,7 @@ export function BackofficeShell({ children }: { children: ReactNode }) {
 
   async function logout() {
     await fetch("/api/auth/logout", { method: "POST" });
-    router.replace("/backoffice/login");
+    router.replace("/connexion");
     router.refresh();
   }
 
@@ -81,9 +84,10 @@ export function BackofficeShell({ children }: { children: ReactNode }) {
       <div className="flex min-h-dvh">
         <aside className="hidden w-64 shrink-0 border-r border-slate-200 bg-white p-5 lg:block">
           <Link href="/" className="block">
-            <BrandLogo size={72} className="rounded-2xl" />
-            <p className="mt-3 text-[11px] uppercase tracking-[0.22em] text-teal-700">Le Zinc Bouillon</p>
-            <p className="mt-1 text-lg font-semibold">Back-office</p>
+            <BrandLogo size={72} src={compte?.logoUrl} alt={nomEtablissement} className="rounded-2xl" />
+            <SanitraceNom className="mt-3" />
+            <p className="mt-1 truncate text-lg font-semibold">{nomEtablissement}</p>
+            <p className="text-sm text-slate-500">Back-office</p>
           </Link>
           <nav className="mt-8 max-h-[calc(100dvh-16rem)] space-y-1 overflow-y-auto pr-1">
             {nav.map((item) => (
@@ -99,8 +103,16 @@ export function BackofficeShell({ children }: { children: ReactNode }) {
           <header className="sticky top-0 z-20 flex items-center justify-between gap-2 border-b border-slate-200 bg-white/95 px-3 py-3 backdrop-blur sm:px-6 md:px-8">
             <div className="flex min-w-0 items-center gap-2 sm:gap-3">
               <BackArrow />
-              <BrandLogo size={36} className="hidden rounded-lg sm:block" />
-              <p className="truncate text-sm font-semibold sm:text-base">Le Zinc Bouillon</p>
+              <BrandLogo
+                size={36}
+                src={compte?.logoUrl}
+                alt={nomEtablissement}
+                className="hidden rounded-lg sm:block"
+              />
+              <div className="min-w-0">
+                <SanitraceNom />
+                <p className="truncate text-sm font-semibold sm:text-base">{nomEtablissement}</p>
+              </div>
             </div>
             <div className="flex shrink-0 items-center gap-2">
               <button
@@ -112,9 +124,9 @@ export function BackofficeShell({ children }: { children: ReactNode }) {
                 <Menu className="h-5 w-5" />
               </button>
               <Link href="/station-impression" className="hidden text-sm text-slate-500 sm:block">
-            Imprimante
-          </Link>
-          <button type="button" onClick={() => void logout()} className="hidden text-sm text-slate-500 sm:block">
+                Imprimante
+              </Link>
+              <button type="button" onClick={() => void logout()} className="hidden text-sm text-slate-500 sm:block">
                 Quitter
               </button>
             </div>
@@ -157,7 +169,10 @@ export function BackofficeShell({ children }: { children: ReactNode }) {
       {menuOpen ? (
         <div className="fixed inset-0 z-50 bg-white lg:hidden">
           <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3">
-            <p className="font-semibold">Menu</p>
+            <div>
+              <SanitraceNom />
+              <p className="font-semibold">{nomEtablissement}</p>
+            </div>
             <button
               type="button"
               className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-200"

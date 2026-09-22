@@ -243,7 +243,12 @@ export function TerrainProvider({ children }: { children: ReactNode }) {
         <header className="sticky top-0 z-20 flex items-center justify-between gap-3 border-b border-slate-200 bg-white/90 px-4 py-3 backdrop-blur">
           <div className="flex min-w-0 items-center gap-3">
             <BackArrow />
-            <BrandLogo size={40} className="rounded-xl" />
+            <BrandLogo
+              size={40}
+              src={bootstrap.etablissement.logoUrl}
+              alt={bootstrap.etablissement.nom}
+              className="rounded-xl"
+            />
             <div className="min-w-0">
               <p className="text-[11px] uppercase tracking-[0.18em] text-teal-700">Sanitrace</p>
               <p className="truncate text-sm font-medium text-slate-900">

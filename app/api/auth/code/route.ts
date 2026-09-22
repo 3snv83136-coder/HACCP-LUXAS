@@ -39,6 +39,7 @@ export async function POST(request: Request) {
     const session = {
       etablissementId: etab.id,
       etablissementNom: etab.nom,
+      logoUrl: etab.logoUrl ?? null,
       organisationId: etab.organisationId,
       membreId: row.membre.id,
       utilisateurId: u.id,

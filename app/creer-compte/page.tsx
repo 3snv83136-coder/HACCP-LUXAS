@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useState, type FormEvent, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,6 +22,8 @@ export default function CreerComptePage() {
     prenom: "",
     nom: "",
     code: "",
+    motDePasse: "",
+    motDePasse2: "",
   });
 
   async function onLogo(file: File) {
@@ -70,6 +73,7 @@ export default function CreerComptePage() {
       <h1 className="mt-3 font-serif text-3xl font-semibold text-slate-900">Créer le compte établissement</h1>
       <p className="mt-2 text-sm text-slate-500">
         Un espace isolé pour ton restaurant : employés, équipements et dossier hygiène.
+        Tu pourras ensuite te reconnecter avec e-mail et mot de passe.
       </p>
 
       <form className="mt-8 space-y-4" onSubmit={(e) => void creer(e)}>
@@ -140,11 +144,51 @@ export default function CreerComptePage() {
             onChange={(e) => setForm({ ...form, code: e.target.value.replace(/\D/g, "").slice(0, 4) })}
           />
         </Field>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <Field label="Mot de passe (8 caractères min.)">
+            <Input
+              type="password"
+              required
+              minLength={8}
+              autoComplete="new-password"
+              value={form.motDePasse}
+              onChange={(e) => setForm({ ...form, motDePasse: e.target.value })}
+            />
+          </Field>
+          <Field label="Confirmer le mot de passe">
+            <Input
+              type="password"
+              required
+              minLength={8}
+              autoComplete="new-password"
+              value={form.motDePasse2}
+              onChange={(e) => setForm({ ...form, motDePasse2: e.target.value })}
+            />
+          </Field>
+        </div>
+        {form.motDePasse && form.motDePasse2 && form.motDePasse !== form.motDePasse2 ? (
+          <p className="text-sm text-red-600">Les mots de passe ne correspondent pas.</p>
+        ) : null}
         {error ? <p className="text-sm text-red-600">{error}</p> : null}
-        <Button className="w-full" size="lg" disabled={saving || form.code.length !== 4}>
+        <Button
+          className="w-full"
+          size="lg"
+          disabled={
+            saving ||
+            form.code.length !== 4 ||
+            form.motDePasse.length < 8 ||
+            form.motDePasse !== form.motDePasse2
+          }
+        >
           {saving ? "Création…" : "Créer le compte"}
         </Button>
       </form>
+      <p className="mt-6 text-sm text-slate-500">
+        Déjà inscrit ?{" "}
+        <Link href="/connexion" className="font-semibold text-teal-800">
+          Se connecter
+        </Link>
+      </p>
     </main>
   );
 }

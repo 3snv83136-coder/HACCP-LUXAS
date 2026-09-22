@@ -30,7 +30,7 @@ export const metadata: Metadata = {
   icons: { icon: "/logo-le-zinc-bouillon.png", apple: "/logo-le-zinc-bouillon.png" },
   appleWebApp: {
     capable: true,
-    title: "Le Zinc Bouillon",
+    title: "Sanitrace",
     statusBarStyle: "default",
   },
 };

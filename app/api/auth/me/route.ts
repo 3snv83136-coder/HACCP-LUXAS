@@ -13,6 +13,7 @@ export async function GET(request: Request) {
     session: {
       etablissementId: session.etablissementId,
       etablissementNom: etab?.nom ?? "",
+      logoUrl: etab?.logoUrl ?? null,
       organisationId: etab?.organisationId ?? "",
       membreId: session.membreId,
       utilisateurId: session.utilisateurId,

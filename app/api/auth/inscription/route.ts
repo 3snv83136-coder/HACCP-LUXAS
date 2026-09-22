@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { hashCode } from "@/lib/crypto";
 import { SESSION_COOKIE, signSession } from "@/lib/auth/session";
+import { optionsCookieAuth } from "@/lib/auth/cookie";
 import { slugifier } from "@/lib/slug";
 import { provisionnerEtablissement } from "@/lib/server/provision";
 
@@ -19,6 +20,7 @@ export async function POST(request: Request) {
     prenom?: string;
     nom?: string;
     code?: string;
+    motDePasse?: string;
   };
 
   const nomEtablissement = (body.nomEtablissement ?? "").trim();
@@ -26,9 +28,13 @@ export async function POST(request: Request) {
   const nom = (body.nom ?? "").trim();
   const email = (body.email ?? "").trim().toLowerCase();
   const code = (body.code ?? "").replace(/\D/g, "").slice(0, 4);
+  const motDePasse = body.motDePasse ?? "";
 
   if (!nomEtablissement || !prenom || !nom || !email) {
     return NextResponse.json({ error: "Établissement, contact et e-mail requis" }, { status: 400 });
+  }
+  if (motDePasse.length < 8) {
+    return NextResponse.json({ error: "Le mot de passe doit faire au moins 8 caractères" }, { status: 400 });
   }
   if (!/^\d{4}$/.test(code)) {
     return NextResponse.json({ error: "Choisis un code administrateur à 4 chiffres" }, { status: 400 });
@@ -42,6 +48,12 @@ export async function POST(request: Request) {
   });
   if (deja) {
     return NextResponse.json({ error: "Un établissement utilise déjà cet e-mail" }, { status: 409 });
+  }
+  const compteExistant = await prisma.utilisateur.findFirst({
+    where: { email: { equals: email, mode: "insensitive" }, motDePasseHash: { not: null } },
+  });
+  if (compteExistant) {
+    return NextResponse.json({ error: "Un compte existe déjà avec cet e-mail. Connecte-toi." }, { status: 409 });
   }
 
   const org = await prisma.organisation.create({ data: { nom: nomEtablissement } });
@@ -58,7 +70,7 @@ export async function POST(request: Request) {
     },
   });
   const utilisateur = await prisma.utilisateur.create({
-    data: { organisationId: org.id, prenom, nom, email },
+    data: { organisationId: org.id, prenom, nom, email, motDePasseHash: await hashCode(motDePasse) },
   });
   const membre = await prisma.membreEtablissement.create({
     data: { utilisateurId: utilisateur.id, etablissementId: etab.id, role: "gerant" },
@@ -83,12 +95,6 @@ export async function POST(request: Request) {
     slug: etab.slug,
     etablissementId: etab.id,
   });
-  res.cookies.set(SESSION_COOKIE, token, {
-    httpOnly: true,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
-    path: "/",
-    maxAge: 60 * 60 * 12,
-  });
+  res.cookies.set(SESSION_COOKIE, token, optionsCookieAuth());
   return res;
 }
