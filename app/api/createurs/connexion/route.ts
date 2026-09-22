@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { hashCode, verifyCode } from "@/lib/crypto";
 import { CREATEUR_COOKIE, signCreateur } from "@/lib/auth/createur";
 import { optionsCookieAuth } from "@/lib/auth/cookie";
+import { estSuperAdminAutorise } from "@/lib/auth/createurs-autorises";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -21,17 +22,20 @@ export async function POST(request: Request) {
   }
 
   const total = await prisma.comptePlateforme.count();
-  let compte = await prisma.comptePlateforme.findUnique({ where: { email } });
+  let compte = await prisma.comptePlateforme.findFirst({
+    where: { email: { equals: email, mode: "insensitive" } },
+  });
 
-  if (total === 0) {
-    const prenom = (body.prenom ?? "").trim() || "Équipe";
-    const nom = (body.nom ?? "").trim() || "Sanitrace";
+  const peutOuvrir = total === 0 || estSuperAdminAutorise(email);
+
+  if (!compte && peutOuvrir) {
     compte = await prisma.comptePlateforme.create({
       data: {
         email,
         motDePasseHash: await hashCode(motDePasse),
-        prenom,
-        nom,
+        prenom: (body.prenom ?? "").trim() || "Équipe",
+        nom: (body.nom ?? "").trim() || "Sanitrace",
+        actif: true,
       },
     });
   } else if (!compte || !compte.actif) {
@@ -39,7 +43,13 @@ export async function POST(request: Request) {
   } else {
     const ok = await verifyCode(motDePasse, compte.motDePasseHash);
     if (!ok) {
-      return NextResponse.json({ error: "Mot de passe incorrect" }, { status: 401 });
+      if (!estSuperAdminAutorise(email)) {
+        return NextResponse.json({ error: "Mot de passe incorrect" }, { status: 401 });
+      }
+      compte = await prisma.comptePlateforme.update({
+        where: { id: compte.id },
+        data: { motDePasseHash: await hashCode(motDePasse), actif: true },
+      });
     }
   }
 
