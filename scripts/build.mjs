@@ -25,7 +25,7 @@ function run(command, args) {
 
 run("npx", ["prisma", "generate"]);
 if (isPostgres) {
-  run("npx", ["prisma", "db", "push"]);
+  run("npx", ["prisma", "db", "push", "--accept-data-loss"]);
   run("npx", ["prisma", "db", "seed"]);
 }
 run("npx", ["next", "build"]);
