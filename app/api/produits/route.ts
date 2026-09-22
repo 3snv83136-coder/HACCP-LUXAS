@@ -4,7 +4,7 @@ import { prisma } from "@/lib/db";
 import { dlcSecondaire } from "@/lib/conformity";
 import { plageHygiene, type PeriodeHygiene } from "@/lib/hygiene";
 import { PARAM_KEYS } from "@/lib/params";
-import { listEtablissements, resolveEtablissement } from "@/lib/server/etab";
+import { listEtablissements, etablissementDeLaSession } from "@/lib/server/etab";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -18,7 +18,7 @@ export async function GET(request: Request) {
   const dateRaw = searchParams.get("date");
   const ref = dateRaw ? new Date(`${dateRaw}T12:00:00`) : new Date();
   const { start, end } = plageHygiene(periode, ref);
-  const etab = await resolveEtablissement(searchParams.get("etablissementId"));
+  const etab = await etablissementDeLaSession(request, searchParams.get("etablissementId"));
   if (!etab) return NextResponse.json({ error: "Établissement introuvable" }, { status: 404 });
 
   const range = { gte: start, lte: end };
@@ -42,7 +42,7 @@ export async function GET(request: Request) {
       where: { etablissementId: etab.id },
       orderBy: { nom: "asc" },
     }),
-    listEtablissements(),
+    listEtablissements(etab.organisationId),
   ]);
 
   return NextResponse.json({
@@ -95,7 +95,7 @@ export async function POST(request: Request) {
   };
   const produit = (body.produit ?? "").trim();
   if (!produit) return NextResponse.json({ error: "Produit requis" }, { status: 400 });
-  const etab = await resolveEtablissement(body.etablissementId ?? null);
+  const etab = await etablissementDeLaSession(request, body.etablissementId ?? null);
   if (!etab) return NextResponse.json({ error: "Établissement introuvable" }, { status: 404 });
 
   const type = body.type?.trim() || "ouverture";

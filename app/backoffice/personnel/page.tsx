@@ -121,6 +121,12 @@ export default function PersonnelPage() {
     await load();
   }
 
+  async function supprimer(id: string) {
+    if (!window.confirm("Retirer cet employé de l’établissement ?")) return;
+    await fetch(`/api/personnel?id=${id}`, { method: "DELETE" });
+    await load();
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
@@ -213,6 +219,7 @@ export default function PersonnelPage() {
                 setError(null);
               }}
               onArchive={() => void setActif(p.id, false)}
+              onDelete={() => void supprimer(p.id)}
             />
           ))
         )}
@@ -301,11 +308,13 @@ function CartePersonne({
   personne,
   onEdit,
   onArchive,
+  onDelete,
   onRestore,
 }: {
   personne: Personne;
   onEdit?: () => void;
   onArchive?: () => void;
+  onDelete?: () => void;
   onRestore?: () => void;
 }) {
   const role = roles.find((r) => r.id === personne.role);
@@ -331,6 +340,11 @@ function CartePersonne({
         {onArchive ? (
           <Button variant="ghost" className="flex-1 sm:flex-none" onClick={onArchive}>
             Désactiver
+          </Button>
+        ) : null}
+        {onDelete ? (
+          <Button variant="ghost" className="flex-1 text-red-700 sm:flex-none" onClick={onDelete}>
+            Supprimer
           </Button>
         ) : null}
         {onRestore ? (

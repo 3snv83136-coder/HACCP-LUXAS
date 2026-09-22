@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getBootstrap } from "@/lib/server/bootstrap";
 import { collecterAlertes } from "@/lib/server/alerts";
 import { buildTachesDuJour } from "@/lib/tasks";
-import { listEtablissements, resolveEtablissement } from "@/lib/server/etab";
+import { etablissementDeLaSession, listEtablissements } from "@/lib/server/etab";
 import { prisma } from "@/lib/db";
 import { startOfDay } from "@/lib/utils";
 
@@ -11,8 +11,8 @@ export const runtime = "nodejs";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const etabs = await listEtablissements();
-  const current = await resolveEtablissement(searchParams.get("etablissementId"));
+  const current = await etablissementDeLaSession(request, searchParams.get("etablissementId"));
+  const etabs = current ? await listEtablissements(current.organisationId) : [];
   if (!current) return NextResponse.json({ error: "Aucun établissement" }, { status: 404 });
 
   const bootstrap = await getBootstrap(current.id);

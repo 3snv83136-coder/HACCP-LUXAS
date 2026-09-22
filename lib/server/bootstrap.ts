@@ -56,7 +56,7 @@ export async function getBootstrap(etablissementId?: string): Promise<BootstrapP
     }),
     prisma.checklistExecution.findMany({
       where: { checklist: { etablissementId: etab.id }, createdAt: { gte: since } },
-      select: { checklistId: true, createdAt: true },
+      select: { checklistId: true, createdAt: true, codeOperateurId: true },
     }),
     prisma.platTemoin.findMany({
       where: { etablissementId: etab.id, createdAt: { gte: new Date(Date.now() - 10 * 24 * 3600 * 1000) } },
@@ -144,6 +144,7 @@ export async function getBootstrap(etablissementId?: string): Promise<BootstrapP
     checklistExecutions: checklistExecs.map((e) => ({
       checklistId: e.checklistId,
       createdAt: e.createdAt.toISOString(),
+      codeOperateurId: e.codeOperateurId,
     })),
     platsTemoins: plats.map((p) => ({
       id: p.id,

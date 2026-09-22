@@ -6,7 +6,15 @@ const BACKOFFICE_ROLES = new Set(["responsable", "gerant"]);
 
 function isProtectedPage(pathname: string) {
   if (pathname === "/backoffice/login") return false;
-  return pathname === "/backoffice" || pathname.startsWith("/backoffice/");
+  if (pathname.startsWith("/acces/")) return false;
+  return (
+    pathname === "/backoffice" ||
+    pathname.startsWith("/backoffice/") ||
+    pathname === "/hygiene" ||
+    pathname.startsWith("/hygiene/") ||
+    pathname === "/station-impression" ||
+    pathname.startsWith("/station-impression/")
+  );
 }
 
 function isProtectedApi(pathname: string) {
@@ -20,6 +28,9 @@ function isProtectedApi(pathname: string) {
     pathname.startsWith("/api/equipements") ||
     pathname.startsWith("/api/personnel") ||
     pathname.startsWith("/api/produits") ||
+    pathname.startsWith("/api/ressources") ||
+    pathname.startsWith("/api/etiquettes") ||
+    pathname.startsWith("/api/impressions") ||
     pathname.startsWith("/api/alerts")
   );
 }
@@ -31,19 +42,30 @@ export async function middleware(request: NextRequest) {
   }
 
   const session = await readSession(request.cookies.get(SESSION_COOKIE)?.value);
-  const ok = session && BACKOFFICE_ROLES.has(session.role);
+  const apiTerrain =
+    pathname.startsWith("/api/etiquettes") || pathname.startsWith("/api/impressions");
+  const ok = session && (BACKOFFICE_ROLES.has(session.role) || (apiTerrain && session.role));
 
   if (ok) return NextResponse.next();
 
   if (isProtectedApi(pathname)) {
-    return NextResponse.json({ error: "Connexion back-office requise" }, { status: 401 });
+    return NextResponse.json({ error: "Connexion administrateur requise" }, { status: 401 });
   }
 
-  const login = new URL("/backoffice/login", request.url);
+  const loginPath = pathname.startsWith("/hygiene") ? "/acces/hygiene" : "/acces/administrateur";
+  const login = new URL(loginPath, request.url);
   login.searchParams.set("next", pathname);
   return NextResponse.redirect(login);
 }
 
 export const config = {
-  matcher: ["/backoffice", "/backoffice/:path*", "/api/:path*"],
+  matcher: [
+    "/backoffice",
+    "/backoffice/:path*",
+    "/hygiene",
+    "/hygiene/:path*",
+    "/station-impression",
+    "/station-impression/:path*",
+    "/api/:path*",
+  ],
 };

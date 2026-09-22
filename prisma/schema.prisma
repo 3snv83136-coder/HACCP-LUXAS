@@ -28,6 +28,10 @@ model Etablissement {
   organisationId String   @map("organisation_id")
   nom            String
   adresse        String?
+  email          String?
+  telephone      String?
+  logoUrl        String?  @map("logo_url")
+  slug           String?  @unique
   typeCuisine    String   @map("type_cuisine")
   actif          Boolean  @default(true)
   createdAt      DateTime @default(now()) @map("created_at")
@@ -51,6 +55,8 @@ model Etablissement {
   documentsPms         DocumentPms[]
   auditLogs            AuditLog[]
   alertes              Alerte[]
+  capturesEtiquette    CaptureEtiquette[]
+  impressions          Impression[]
 
   @@index([organisationId])
   @@map("etablissement")
@@ -497,5 +503,45 @@ model AuditLog {
 
   @@index([etablissementId, createdAt])
   @@map("audit_log")
+  @@schema("haccp")
+}
+
+model CaptureEtiquette {
+  id              String   @id @default(cuid())
+  etablissementId String   @map("etablissement_id")
+  produit         String
+  lot             String?
+  dlc             String?
+  type            String   @default("ouverture")
+  photoUrl        String   @map("photo_url")
+  createdBy       String   @map("created_by")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  etablissement Etablissement @relation(fields: [etablissementId], references: [id], onDelete: Restrict)
+  impressions   Impression[]
+
+  @@index([etablissementId, createdAt])
+  @@map("capture_etiquette")
+  @@schema("haccp")
+}
+
+model Impression {
+  id              String    @id @default(cuid())
+  etablissementId String    @map("etablissement_id")
+  captureId       String?   @map("capture_id")
+  produit         String
+  lot             String?
+  dlc             String?
+  type            String
+  photoUrl        String?   @map("photo_url")
+  statut          String    @default("attente")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  imprimeAt       DateTime? @map("imprime_at")
+
+  etablissement Etablissement     @relation(fields: [etablissementId], references: [id], onDelete: Restrict)
+  capture       CaptureEtiquette? @relation(fields: [captureId], references: [id], onDelete: SetNull)
+
+  @@index([etablissementId, statut, createdAt])
+  @@map("impression")
   @@schema("haccp")
 }

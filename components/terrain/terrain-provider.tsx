@@ -68,9 +68,15 @@ export function TerrainProvider({ children }: { children: ReactNode }) {
   const [releves, setReleves] = useState<ReleveLocal[]>([]);
   const [pending, setPending] = useState(0);
   const [pin, setPin] = useState("");
+  const [identifiant, setIdentifiant] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    const saved = localStorage.getItem("sanitrace_identifiant");
+    if (saved) setIdentifiant(saved);
+  }, []);
 
   const hydrate = useCallback(async (current: SessionOperateur) => {
     const cached = await loadBootstrap(current.etablissementId);
@@ -96,6 +102,19 @@ export function TerrainProvider({ children }: { children: ReactNode }) {
       if (existing) {
         setSession(existing);
         await hydrate(existing);
+        setLoading(false);
+        return;
+      }
+      try {
+        const res = await fetch("/api/auth/me");
+        if (res.ok) {
+          const data = (await res.json()) as { session: SessionOperateur };
+          await saveSession(data.session);
+          setSession(data.session);
+          await hydrate(data.session);
+        }
+      } catch {
+        /* hors-ligne */
       }
       setLoading(false);
     })();
@@ -106,10 +125,15 @@ export function TerrainProvider({ children }: { children: ReactNode }) {
     setSubmitting(true);
     setError(null);
     try {
+      const saved =
+        identifiant ||
+        (typeof window !== "undefined" ? localStorage.getItem("sanitrace_identifiant") : null) ||
+        undefined;
+      if (saved) localStorage.setItem("sanitrace_identifiant", saved);
       const res = await fetch("/api/auth/code", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code: pin }),
+        body: JSON.stringify({ code: pin, identifiant: saved }),
       });
       const data = (await res.json()) as { session?: SessionOperateur; error?: string };
       if (!res.ok || !data.session) {
@@ -170,12 +194,18 @@ export function TerrainProvider({ children }: { children: ReactNode }) {
           <BackArrow />
           <BrandLogo size={120} className="mt-6 rounded-3xl" />
           <p className="mt-6 text-xs font-semibold uppercase tracking-[0.22em] text-teal-700">
-            Le Zinc Bouillon · terrain
+            Sanitrace · accès employés
           </p>
-          <h1 className="mt-3 text-3xl font-semibold tracking-tight text-slate-900">Ton code</h1>
+          <h1 className="mt-3 font-serif text-3xl font-semibold tracking-tight text-slate-900">Ton code</h1>
           <p className="mt-2 text-sm text-slate-500">
             Signature personnelle. Chaque relevé restera horodaté à ton nom.
           </p>
+          <input
+            value={identifiant}
+            onChange={(e) => setIdentifiant(e.target.value)}
+            placeholder="Slug ou e-mail de l’établissement"
+            className="mt-6 h-12 w-full rounded-2xl border border-slate-200 px-4 text-sm"
+          />
           <p className="mt-8 text-center font-mono text-5xl tracking-[0.4em] text-slate-900">
             {pin.padEnd(4, "•")}
           </p>
@@ -215,7 +245,7 @@ export function TerrainProvider({ children }: { children: ReactNode }) {
             <BackArrow />
             <BrandLogo size={40} className="rounded-xl" />
             <div className="min-w-0">
-              <p className="text-[11px] uppercase tracking-[0.18em] text-teal-700">Le Zinc Bouillon</p>
+              <p className="text-[11px] uppercase tracking-[0.18em] text-teal-700">Sanitrace</p>
               <p className="truncate text-sm font-medium text-slate-900">
                 {session.prenom} · {session.etablissementNom}
               </p>

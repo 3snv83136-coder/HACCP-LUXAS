@@ -13,6 +13,8 @@ async function main() {
     }
   }
 
+  await prisma.impression.deleteMany();
+  await prisma.captureEtiquette.deleteMany();
   await prisma.alerte.deleteMany();
   await prisma.auditLog.deleteMany();
   await prisma.nonConformite.deleteMany();
@@ -50,6 +52,8 @@ async function main() {
       organisationId: org.id,
       nom: "Cuisine Luxas",
       adresse: "À paramétrer",
+      email: "gerant@luxas.local",
+      slug: "luxas",
       typeCuisine: "restauration_commerciale",
     },
   });
@@ -426,6 +430,7 @@ async function main() {
       organisationId: org.id,
       nom: "Sandwicherie Nice",
       adresse: "Nice",
+      slug: "nice",
       typeCuisine: "restauration_commerciale",
     },
   });

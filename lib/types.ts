@@ -123,7 +123,7 @@ export type BootstrapPayload = {
   checklists: { id: string; nom: string; type: string; items: { id: string; libelle: string; ordre: number }[] }[];
   relevesRecents: ReleveLocal[];
   executionsNettoyage: { tacheNettoyageId: string; faitAt: string }[];
-  checklistExecutions: { checklistId: string; createdAt: string }[];
+  checklistExecutions: { checklistId: string; createdAt: string; codeOperateurId?: string }[];
   platsTemoins: PlatTemoinRef[];
   huiles: HuileRef[];
   nonConformitesOuvertes: number;

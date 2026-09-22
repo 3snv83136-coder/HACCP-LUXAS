@@ -1,16 +1,16 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { hashCode, verifyCode } from "@/lib/crypto";
-import { listEtablissements, resolveEtablissement } from "@/lib/server/etab";
+import { etablissementDeLaSession, listEtablissements } from "@/lib/server/etab";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 const ROLES = new Set(["operateur", "responsable", "gerant"]);
 
-async function codeDejaUtilise(code: string, exceptMembreId?: string) {
+async function codeDejaUtilise(code: string, etablissementId: string, exceptMembreId?: string) {
   const rows = await prisma.codeOperateur.findMany({
-    where: { actif: true },
+    where: { actif: true, membre: { etablissementId } },
     select: { codeHash: true, membreEtablissementId: true },
   });
   for (const row of rows) {
@@ -22,7 +22,7 @@ async function codeDejaUtilise(code: string, exceptMembreId?: string) {
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const etab = await resolveEtablissement(searchParams.get("etablissementId"));
+  const etab = await etablissementDeLaSession(request, searchParams.get("etablissementId"));
   if (!etab) return NextResponse.json({ items: [] });
 
   const [membres, etablissements] = await Promise.all([
@@ -34,7 +34,7 @@ export async function GET(request: Request) {
       },
       orderBy: [{ role: "asc" }, { utilisateur: { nom: "asc" } }],
     }),
-    listEtablissements(),
+    listEtablissements(etab.organisationId),
   ]);
 
   return NextResponse.json({
@@ -78,9 +78,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Code à 4 chiffres requis" }, { status: 400 });
   }
 
-  const etab = await resolveEtablissement(body.etablissementId ?? null);
+  const etab = await etablissementDeLaSession(request, body.etablissementId ?? null);
   if (!etab) return NextResponse.json({ error: "Établissement introuvable" }, { status: 404 });
-  if (await codeDejaUtilise(code)) {
+  if (await codeDejaUtilise(code, etab.id)) {
     return NextResponse.json({ error: "Ce code est déjà attribué" }, { status: 409 });
   }
 
@@ -136,7 +136,7 @@ export async function PATCH(request: Request) {
     if (!/^\d{4}$/.test(code)) {
       return NextResponse.json({ error: "Code à 4 chiffres requis" }, { status: 400 });
     }
-    if (await codeDejaUtilise(code, membre.id)) {
+    if (await codeDejaUtilise(code, membre.etablissementId, membre.id)) {
       return NextResponse.json({ error: "Ce code est déjà attribué" }, { status: 409 });
     }
   }
@@ -187,5 +187,28 @@ export async function PATCH(request: Request) {
     }
   });
 
+  return NextResponse.json({ ok: true });
+}
+
+export async function DELETE(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const id = searchParams.get("id");
+  if (!id) return NextResponse.json({ error: "id requis" }, { status: 400 });
+  const etab = await etablissementDeLaSession(request);
+  if (!etab) return NextResponse.json({ error: "Établissement introuvable" }, { status: 404 });
+
+  const membre = await prisma.membreEtablissement.findFirst({
+    where: { id, etablissementId: etab.id },
+  });
+  if (!membre) return NextResponse.json({ error: "Salarié introuvable" }, { status: 404 });
+
+  await prisma.$transaction([
+    prisma.codeOperateur.updateMany({
+      where: { membreEtablissementId: membre.id },
+      data: { actif: false },
+    }),
+    prisma.membreEtablissement.update({ where: { id: membre.id }, data: { actif: false } }),
+    prisma.utilisateur.update({ where: { id: membre.utilisateurId }, data: { actif: false } }),
+  ]);
   return NextResponse.json({ ok: true });
 }

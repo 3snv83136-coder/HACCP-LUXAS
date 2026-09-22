@@ -18,6 +18,7 @@ import {
   SlidersHorizontal,
   Tags,
   Users,
+  Warehouse,
   X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -29,6 +30,7 @@ const nav = [
   { href: "/backoffice/hygiene", label: "Contrôle hygiène", icon: ClipboardCheck },
   { href: "/backoffice/produits", label: "Produits", icon: Package },
   { href: "/backoffice/personnel", label: "Salariés", icon: Users },
+  { href: "/backoffice/ressources", label: "Ressources", icon: Warehouse },
   { href: "/backoffice/non-conformites", label: "CAPA", icon: ShieldAlert },
   { href: "/backoffice/equipements", label: "Équipements QR", icon: QrCode },
   { href: "/backoffice/tracabilite", label: "Traçabilité", icon: Tags },
@@ -109,7 +111,10 @@ export function BackofficeShell({ children }: { children: ReactNode }) {
               >
                 <Menu className="h-5 w-5" />
               </button>
-              <button type="button" onClick={() => void logout()} className="hidden text-sm text-slate-500 sm:block">
+              <Link href="/station-impression" className="hidden text-sm text-slate-500 sm:block">
+            Imprimante
+          </Link>
+          <button type="button" onClick={() => void logout()} className="hidden text-sm text-slate-500 sm:block">
                 Quitter
               </button>
             </div>

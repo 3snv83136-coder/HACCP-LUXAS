@@ -1,12 +1,13 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import QRCode from "qrcode";
+import { etablissementDeLaSession } from "@/lib/server/etab";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-export async function GET() {
-  const etab = await prisma.etablissement.findFirst();
+export async function GET(request: Request) {
+  const etab = await etablissementDeLaSession(request);
   if (!etab) return NextResponse.json({ equipements: [] });
 
   const equipements = await prisma.equipement.findMany({

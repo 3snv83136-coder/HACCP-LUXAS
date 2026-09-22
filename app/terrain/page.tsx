@@ -1,12 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { Camera, ClipboardList, Droplets, Flame, Package, Tag, TriangleAlert, UtensilsCrossed } from "lucide-react";
+import { Camera, ClipboardList, Droplets, Flame, Images, Package, Tag, TriangleAlert, UtensilsCrossed } from "lucide-react";
 import { TaskCard } from "@/components/terrain/task-card";
 import { useTerrain } from "@/components/terrain/terrain-provider";
 
 const shortcuts = [
   { href: "/terrain/scan", label: "Scan QR", icon: Camera },
+  { href: "/terrain/tracabilite", label: "Traçabilité", icon: Images },
   { href: "/terrain/reception", label: "Réception", icon: Package },
   { href: "/terrain/menage", label: "Ménage", icon: Droplets },
   { href: "/terrain/etiquette", label: "Étiquette", icon: Tag },
@@ -34,7 +35,7 @@ export default function TerrainHomePage() {
         </button>
       </section>
 
-      <div className="grid grid-cols-4 gap-2">
+      <div className="grid grid-cols-4 gap-2 sm:grid-cols-4">
         {shortcuts.map((s) => (
           <Link
             key={s.href}
