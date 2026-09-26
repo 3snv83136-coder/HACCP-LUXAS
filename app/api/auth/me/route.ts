@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { SESSION_COOKIE, signSession } from "@/lib/auth/session";
 import { optionsCookieAuth } from "@/lib/auth/cookie";
 import { sessionDepuisRequete } from "@/lib/server/session-request";
-import { sessionOperateurLibre } from "@/lib/server/acces-libre";
+import { payloadSession, sessionOperateurLibre } from "@/lib/server/acces-libre";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -14,8 +14,6 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Aucun établissement. Crée un compte d’abord." }, { status: 404 });
   }
 
-  const { exp: _ignore, ...payload } = session;
-  void _ignore;
   const res = NextResponse.json({
     session: {
       ...vue,
@@ -28,6 +26,6 @@ export async function GET(request: Request) {
       role: session.role,
     },
   });
-  res.cookies.set(SESSION_COOKIE, await signSession(payload), optionsCookieAuth());
+  res.cookies.set(SESSION_COOKIE, await signSession(payloadSession(session)), optionsCookieAuth());
   return res;
 }

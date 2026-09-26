@@ -69,12 +69,23 @@ export async function sessionOperateurLibre(): Promise<SessionOperateur | null> 
   };
 }
 
+export function payloadSession(session: SessionPayload) {
+  return {
+    membreId: session.membreId,
+    utilisateurId: session.utilisateurId,
+    codeOperateurId: session.codeOperateurId,
+    etablissementId: session.etablissementId,
+    role: session.role,
+    prenom: session.prenom,
+    nom: session.nom,
+  };
+}
+
 export async function redirigerLibre(request: Request, dest: string) {
   const session = await sessionLibre();
   const res = NextResponse.redirect(new URL(dest, request.url));
   if (session) {
-    const { exp: _exp, ...payload } = session;
-    res.cookies.set(SESSION_COOKIE, await signSession(payload), optionsCookieAuth());
+    res.cookies.set(SESSION_COOKIE, await signSession(payloadSession(session)), optionsCookieAuth());
   }
   const token = await signCreateur({
     createurId: "qg",
