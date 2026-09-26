@@ -11,7 +11,8 @@ import { BrandLogo } from "@/components/brand/logo";
 export function CreateursConnexionForm() {
   const router = useRouter();
   const search = useSearchParams();
-  const [code, setCode] = useState("");
+  const [email, setEmail] = useState("");
+  const [motDePasse, setMotDePasse] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
@@ -22,7 +23,7 @@ export function CreateursConnexionForm() {
     const res = await fetch("/api/createurs/connexion", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ code }),
+      body: JSON.stringify({ email, motDePasse }),
     });
     const data = (await res.json()) as { error?: string };
     setSaving(false);
@@ -46,23 +47,33 @@ export function CreateursConnexionForm() {
         </p>
         <h1 className="mt-2 font-serif text-3xl font-semibold text-white">Connexion</h1>
         <p className="mt-2 text-sm text-zinc-400">
-          Entre le code d’accès pour ouvrir le dashboard super administrateur.
+          Identifie-toi pour ouvrir le dashboard.
         </p>
 
         <form className="mt-8 space-y-4" onSubmit={(e) => void envoyer(e)}>
           <label className="block space-y-1.5">
-            <Label className="text-zinc-300">Code d’accès</Label>
+            <Label className="text-zinc-300">E-mail</Label>
+            <Input
+              className="border-white/15 bg-black/40 text-white"
+              type="email"
+              autoComplete="username"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </label>
+          <label className="block space-y-1.5">
+            <Label className="text-zinc-300">Mot de passe</Label>
             <Input
               className="border-white/15 bg-black/40 text-white"
               type="password"
-              autoComplete="off"
-              value={code}
-              onChange={(e) => setCode(e.target.value)}
+              autoComplete="current-password"
+              value={motDePasse}
+              onChange={(e) => setMotDePasse(e.target.value)}
             />
           </label>
           {error ? <p className="text-sm text-red-400">{error}</p> : null}
           <Button className="w-full bg-amber-300 text-black hover:bg-amber-200" size="lg" disabled={saving}>
-            {saving ? "Vérification…" : "Entrer"}
+            {saving ? "Connexion…" : "Entrer"}
           </Button>
         </form>
       </div>
