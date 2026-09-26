@@ -1,17 +1,19 @@
 import { NextResponse } from "next/server";
 import { CREATEUR_COOKIE, signCreateur } from "@/lib/auth/createur";
 import { optionsCookieAuth } from "@/lib/auth/cookie";
+import { redirigerLibre } from "@/lib/server/acces-libre";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-export async function POST(request: Request) {
-  const body = (await request.json()) as { email?: string; motDePasse?: string };
-  const email = (body.email ?? "").trim().toLowerCase();
+export async function GET(request: Request) {
+  return redirigerLibre(request, "/createurs");
+}
 
+export async function POST() {
   const token = await signCreateur({
     createurId: "qg",
-    email: email || "qg@sanitrace",
+    email: "qg@sanitrace",
     prenom: "Q.G.",
     nom: "Sanitrace",
   });

@@ -1,27 +1,33 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
+import { SESSION_COOKIE, signSession } from "@/lib/auth/session";
+import { optionsCookieAuth } from "@/lib/auth/cookie";
 import { sessionDepuisRequete } from "@/lib/server/session-request";
+import { sessionOperateurLibre } from "@/lib/server/acces-libre";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 export async function GET(request: Request) {
   const session = await sessionDepuisRequete(request);
-  if (!session) return NextResponse.json({ error: "Non connecté" }, { status: 401 });
-  const etab = await prisma.etablissement.findUnique({ where: { id: session.etablissementId } });
-  return NextResponse.json({
+  const vue = await sessionOperateurLibre();
+  if (!session || !vue) {
+    return NextResponse.json({ error: "Aucun établissement. Crée un compte d’abord." }, { status: 404 });
+  }
+
+  const { exp: _ignore, ...payload } = session;
+  void _ignore;
+  const res = NextResponse.json({
     session: {
+      ...vue,
       etablissementId: session.etablissementId,
-      etablissementNom: etab?.nom ?? "",
-      logoUrl: etab?.logoUrl ?? null,
-      organisationId: etab?.organisationId ?? "",
       membreId: session.membreId,
       utilisateurId: session.utilisateurId,
       codeOperateurId: session.codeOperateurId,
       nom: session.nom,
       prenom: session.prenom,
       role: session.role,
-      signedAt: new Date().toISOString(),
     },
   });
+  res.cookies.set(SESSION_COOKIE, await signSession(payload), optionsCookieAuth());
+  return res;
 }

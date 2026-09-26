@@ -4,7 +4,7 @@ import { TitreAccesSecret, MarqueAccesSecret } from "@/components/brand/titre-ac
 
 const acces = [
   {
-    href: "/acces/employes",
+    href: "/terrain",
     label: "Accès employés",
     texte: "Relevés, ménage, réceptions et étiquettes sur le terrain.",
     icon: ChefHat,
@@ -12,7 +12,7 @@ const acces = [
     iconTone: "bg-teal-50 text-teal-800",
   },
   {
-    href: "/acces/administrateur",
+    href: "/backoffice",
     label: "Accès administrateur",
     texte: "Équipe, frigos, friteuses, surfaces et paramétrage PMS.",
     icon: LayoutDashboard,
@@ -20,7 +20,7 @@ const acces = [
     iconTone: "bg-slate-100 text-slate-800",
   },
   {
-    href: "/acces/hygiene",
+    href: "/hygiene",
     label: "Accès hygiène",
     texte: "Dossier inspecteur et export PDF filtré par employé, mois et type.",
     icon: ClipboardCheck,
@@ -41,10 +41,10 @@ export default function HomePage() {
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <Link
-              href="/connexion"
+              href="/backoffice"
               className="inline-flex h-11 items-center rounded-full border border-slate-200 bg-white px-5 text-sm font-semibold text-slate-900"
             >
-              Se connecter
+              Back-office
             </Link>
             <Link
               href="/creer-compte"

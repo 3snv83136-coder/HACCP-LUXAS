@@ -1,10 +1,8 @@
-import { NextResponse } from "next/server";
+import { redirigerLibre } from "@/lib/server/acces-libre";
 
 export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
-export async function GET() {
-  return NextResponse.json(
-    { error: "Le mode entraînement sans code est désactivé." },
-    { status: 403 },
-  );
+export async function GET(request: Request) {
+  return redirigerLibre(request, "/terrain");
 }

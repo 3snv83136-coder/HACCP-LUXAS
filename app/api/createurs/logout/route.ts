@@ -8,3 +8,5 @@ export async function POST() {
   res.cookies.set(CREATEUR_COOKIE, "", { httpOnly: true, path: "/", maxAge: 0 });
   return res;
 }
+
+export const GET = POST;
