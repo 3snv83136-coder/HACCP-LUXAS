@@ -10,32 +10,42 @@ export default function TerrainTracabilitePage() {
   const [photo, setPhoto] = useState<string | null>(null);
   const [produit, setProduit] = useState("");
   const [lot, setLot] = useState("");
-  const [dlc, setDlc] = useState("");
-  const [ok, setOk] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [ok, setOk] = useState<"sauve" | "imprime" | null>(null);
+  const [qrUrl, setQrUrl] = useState<string | null>(null);
 
-  async function envoyer() {
-    await fetch("/api/etiquettes", {
+  async function enregistrer(imprimer: boolean) {
+    if (!photo || !produit) return;
+    setSaving(true);
+    setOk(null);
+    const res = await fetch("/api/etiquettes", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         produit,
         lot,
-        dlc,
         type: "ouverture",
         photoUrl: photo,
-        imprimer: true,
+        imprimer,
       }),
     });
-    setOk(true);
+    const data = (await res.json()) as { id?: string };
+    if (data.id) {
+      const url = await import("qrcode").then((m) =>
+        m.toDataURL(`sanitrace:etiquette:${data.id}`, { margin: 1, width: 280 }),
+      );
+      setQrUrl(url);
+    }
+    setOk(imprimer ? "imprime" : "sauve");
     setProduit("");
     setLot("");
-    setDlc("");
     setPhoto(null);
+    setSaving(false);
   }
 
   useEffect(() => {
     if (!ok) return;
-    const t = window.setTimeout(() => setOk(false), 2500);
+    const t = window.setTimeout(() => setOk(null), 4000);
     return () => window.clearTimeout(t);
   }, [ok]);
 
@@ -43,7 +53,7 @@ export default function TerrainTracabilitePage() {
     <div className="space-y-4 pb-10">
       <h1 className="font-serif text-2xl font-semibold text-slate-900">Traçabilité étiquette</h1>
       <p className="text-sm text-slate-500">
-        Photo de l’étiquette, format imprimante, envoi à la station d’impression.
+        Photo de l’étiquette d’origine, enregistrement au dossier. L’envoi à l’imprimante est optionnel.
       </p>
       <PhotoCapture value={photo} onChange={setPhoto} label="Photo étiquette" />
       <label className="block space-y-1.5">
@@ -54,14 +64,34 @@ export default function TerrainTracabilitePage() {
         <Label>Lot</Label>
         <Input value={lot} onChange={(e) => setLot(e.target.value)} />
       </label>
-      <label className="block space-y-1.5">
-        <Label>DLC</Label>
-        <Input value={dlc} onChange={(e) => setDlc(e.target.value)} />
-      </label>
-      <Button className="w-full" size="lg" disabled={!photo || !produit} onClick={() => void envoyer()}>
-        Envoyer à l’imprimante
-      </Button>
-      {ok ? <p className="text-sm text-emerald-700">Étiquette dans la file d’impression.</p> : null}
+      <div className="grid gap-2">
+        <Button
+          className="w-full"
+          size="lg"
+          disabled={!photo || !produit || saving}
+          onClick={() => void enregistrer(false)}
+        >
+          {saving ? "Enregistrement…" : "Enregistrer"}
+        </Button>
+        <Button
+          className="w-full"
+          size="lg"
+          variant="outline"
+          disabled={!photo || !produit || saving}
+          onClick={() => void enregistrer(true)}
+        >
+          Envoyer à l’imprimante
+        </Button>
+      </div>
+      {ok === "sauve" ? <p className="text-sm text-emerald-700">Étiquette enregistrée.</p> : null}
+      {ok === "imprime" ? <p className="text-sm text-emerald-700">Étiquette enregistrée et envoyée à l’imprimante.</p> : null}
+      {qrUrl ? (
+        <div className="rounded-3xl border border-slate-200 bg-white p-5 text-center">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={qrUrl} alt="QR de l’étiquette" className="mx-auto h-40 w-40" />
+          <p className="mt-2 text-sm text-slate-500">QR à coller / scanner plus tard</p>
+        </div>
+      ) : null}
     </div>
   );
 }

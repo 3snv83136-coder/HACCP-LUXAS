@@ -4,6 +4,8 @@ import { useEffect, useMemo, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { labelPlage, type PeriodeHygiene } from "@/lib/hygiene";
+import { dlcEstAffichee } from "@/lib/dlc";
+import { libelleEtatHuile } from "@/lib/huile-etat";
 import { formatDateHeure, formatTemp, todayIsoDate } from "@/lib/utils";
 import { Printer } from "lucide-react";
 
@@ -226,8 +228,8 @@ export default function HygienePage() {
               <Ligne
                 key={h.id}
                 titre={h.bac}
-                detail={`${h.polaires} % · ${h.action} · ${h.auteur} · ${formatDateHeure(h.at)}`}
-                ok={h.action !== "vidange"}
+                detail={`${libelleEtatHuile(h.action, h.polaires)} · ${h.auteur} · ${formatDateHeure(h.at)}`}
+                ok={!["vidange", "a_changer"].includes(h.action)}
               />
             ))}
           </Bloc>
@@ -238,13 +240,13 @@ export default function HygienePage() {
             ))}
           </Bloc>
 
-          <Bloc titre="8. Traçabilité lots / DLC secondaires" vide={data.lots.length === 0}>
+          <Bloc titre="8. Traçabilité lots" vide={data.lots.length === 0}>
             {data.lots.map((l) => (
               <Ligne
                 key={l.id}
                 titre={l.produit}
-                detail={`${l.type} · DLC ${new Date(l.dlc).toLocaleString("fr-FR")}`}
-                ok={new Date(l.dlc) > new Date()}
+                detail={dlcEstAffichee(l.dlc) ? `${l.type} · DLC ${new Date(l.dlc).toLocaleString("fr-FR")}` : l.type}
+                ok
               />
             ))}
           </Bloc>

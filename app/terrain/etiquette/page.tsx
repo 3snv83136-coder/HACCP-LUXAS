@@ -6,19 +6,17 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useTerrain } from "@/components/terrain/terrain-provider";
-import { dlcSecondaire } from "@/lib/conformity";
 import { enqueueGeneric } from "@/lib/offline/sync";
 
 type Kind = "decongelation" | "ouverture" | "fabrication";
 
 export default function EtiquettePage() {
-  const { session, bootstrap } = useTerrain();
+  const { session } = useTerrain();
   const [kind, setKind] = useState<Kind>("ouverture");
   const [produit, setProduit] = useState("");
   const [lot, setLot] = useState("");
   const [preview, setPreview] = useState<{
     qr: string;
-    dlc: Date;
     produit: string;
     kind: Kind;
   } | null>(null);
@@ -27,7 +25,6 @@ export default function EtiquettePage() {
   const debut = useMemo(() => new Date(), []);
 
   async function generer() {
-    const dlc = dlcSecondaire(kind, debut, bootstrap.params);
     const qr = nanoid(10);
     await enqueueGeneric("lot_produit", qr, {
       etablissementId: session.etablissementId,
@@ -35,7 +32,6 @@ export default function EtiquettePage() {
       produit,
       lotSource: lot || null,
       dateDebut: debut.toISOString(),
-      dlcSecondaire: dlc.toISOString(),
       qrToken: qr,
       createdBy: session.codeOperateurId,
     });
@@ -43,12 +39,12 @@ export default function EtiquettePage() {
       m.toDataURL(`sanitrace:lot:${qr}`, { margin: 1, width: 280 }),
     );
     setQrUrl(url);
-    setPreview({ qr, dlc, produit, kind });
+    setPreview({ qr, produit, kind });
   }
 
   return (
     <div className="space-y-4 pb-10">
-      <h1 className="text-2xl font-semibold text-slate-900">Étiquette DLC secondaire</h1>
+      <h1 className="text-2xl font-semibold text-slate-900">Étiquette</h1>
       <div className="grid grid-cols-3 gap-2">
         {(
           [
@@ -87,9 +83,6 @@ export default function EtiquettePage() {
           <img src={qrUrl} alt={`QR étiquette ${preview.produit}`} className="mx-auto h-40 w-40" />
           <p className="mt-2 text-lg font-bold">{preview.produit}</p>
           <p className="text-sm uppercase tracking-wide">{preview.kind}</p>
-          <p className="mt-2 font-mono text-sm">
-            DLC sec. {preview.dlc.toLocaleString("fr-FR")}
-          </p>
           <p className="text-xs text-slate-500">{preview.qr}</p>
         </div>
       ) : null}

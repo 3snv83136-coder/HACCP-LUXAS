@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Building2, Tags, Thermometer, Trash2, Users } from "lucide-react";
 import { BrandLogo } from "@/components/brand/logo";
+import { BackArrow } from "@/components/navigation/back-arrow";
 import { Button } from "@/components/ui/button";
 
 type EtabLigne = {
@@ -102,6 +103,7 @@ export default function CreateursDashboardPage() {
       <header className="relative border-b border-white/10">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 py-4">
           <div className="flex items-center gap-3">
+            <BackArrow className="border-white/20 bg-white/10 text-white hover:bg-white/20" />
             <BrandLogo size={44} />
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-amber-300/80">

@@ -11,15 +11,15 @@ export async function GET(request: Request) {
 
   const [frigos, friteuses, surfaces] = await Promise.all([
     prisma.equipement.findMany({
-      where: { etablissementId: etab.id },
+      where: { etablissementId: etab.id, actif: true },
       orderBy: { nom: "asc" },
     }),
     prisma.huileFriture.findMany({
-      where: { etablissementId: etab.id },
+      where: { etablissementId: etab.id, actif: true },
       orderBy: { bac: "asc" },
     }),
     prisma.tacheNettoyage.findMany({
-      where: { etablissementId: etab.id },
+      where: { etablissementId: etab.id, actif: true },
       orderBy: { zone: "asc" },
     }),
   ]);
@@ -76,6 +76,38 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: true, item });
   }
   return NextResponse.json({ error: "Type inconnu" }, { status: 400 });
+}
+
+export async function PATCH(request: Request) {
+  const etab = await etablissementDeLaSession(request);
+  if (!etab) return NextResponse.json({ error: "Établissement introuvable" }, { status: 404 });
+  const body = (await request.json()) as { kind?: string; id?: string; nom?: string };
+  const kind = body.kind ?? "";
+  const id = body.id ?? "";
+  const nom = (body.nom ?? "").trim();
+  if (!kind || !id || !nom) {
+    return NextResponse.json({ error: "kind, id et nom requis" }, { status: 400 });
+  }
+
+  if (kind === "frigo") {
+    await prisma.equipement.updateMany({
+      where: { id, etablissementId: etab.id },
+      data: { nom },
+    });
+  } else if (kind === "friteuse") {
+    await prisma.huileFriture.updateMany({
+      where: { id, etablissementId: etab.id },
+      data: { bac: nom },
+    });
+  } else if (kind === "surface") {
+    await prisma.tacheNettoyage.updateMany({
+      where: { id, etablissementId: etab.id },
+      data: { zone: nom },
+    });
+  } else {
+    return NextResponse.json({ error: "Type inconnu" }, { status: 400 });
+  }
+  return NextResponse.json({ ok: true });
 }
 
 export async function DELETE(request: Request) {

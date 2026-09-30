@@ -157,6 +157,7 @@ export async function getBootstrap(etablissementId?: string): Promise<BootstrapP
       id: h.id,
       bac: h.bac,
       dernierPolaires: h.releves[0]?.composesPolaires ?? null,
+      dernierAction: h.releves[0]?.action ?? null,
       dernierAt: h.releves[0]?.createdAt.toISOString() ?? null,
     })),
     nonConformitesOuvertes: ncCount,

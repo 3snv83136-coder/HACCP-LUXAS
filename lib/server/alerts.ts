@@ -3,6 +3,8 @@ import { getBootstrap } from "@/lib/server/bootstrap";
 import { pousserAlerte } from "@/lib/server/notify";
 import { buildTachesDuJour } from "@/lib/tasks";
 import { PARAM_KEYS, requireParamNumber } from "@/lib/params";
+import { DLC_NON_APPLICABLE } from "@/lib/dlc";
+import { huileAChanger } from "@/lib/huile-etat";
 import { startOfDay } from "@/lib/utils";
 import { listEtablissements } from "@/lib/server/etab";
 
@@ -106,7 +108,13 @@ export async function collecterAlertes(etablissementId?: string): Promise<Alerte
     }
 
     const lots = await prisma.lotProduit.findMany({
-      where: { etablissementId: etab.id, dlcSecondaire: { lte: new Date(Date.now() + 12 * 3600 * 1000) } },
+      where: {
+        etablissementId: etab.id,
+        dlcSecondaire: {
+          lte: new Date(Date.now() + 12 * 3600 * 1000),
+          lt: DLC_NON_APPLICABLE,
+        },
+      },
       take: 8,
     });
     for (const lot of lots) {
@@ -142,13 +150,12 @@ export async function collecterAlertes(etablissementId?: string): Promise<Alerte
       });
     }
 
-    const seuilHuile = requireParamNumber(bootstrap.params, PARAM_KEYS.HUILE_COMPOSES_POLAIRES_MAX);
     for (const h of bootstrap.huiles) {
-      if (h.dernierPolaires != null && h.dernierPolaires >= seuilHuile) {
+      if (huileAChanger(h.dernierAction, h.dernierPolaires)) {
         out.push({
           type: "huile",
           gravite: "haute",
-          message: `${h.bac} : ${h.dernierPolaires} % de composés polaires (seuil ${seuilHuile} %)`,
+          message: `${h.bac} : huile à changer`,
           href: "/terrain/huile",
           etablissementId: etab.id,
           etablissementNom: etab.nom,

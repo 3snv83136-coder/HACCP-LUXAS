@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 
 type Item = { id: string; nom?: string; bac?: string; zone?: string; type?: string; actif: boolean };
@@ -49,13 +48,22 @@ export default function RessourcesPage() {
     await load();
   }
 
+  async function modifier(k: string, id: string, nouveauNom: string) {
+    await fetch("/api/ressources", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ kind: k, id, nom: nouveauNom }),
+    });
+    await load();
+  }
+
   return (
     <div className="space-y-6">
       <div>
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-teal-700">Administrateur</p>
         <h1 className="mt-1 font-serif text-3xl font-semibold">Ressources cuisine</h1>
         <p className="mt-1 text-slate-500">
-          Ajoute ou retire frigos, friteuses et surfaces de nettoyage.
+          Ajoute, modifie ou supprime frigos, friteuses et surfaces de nettoyage.
           {slug ? ` Identifiant établissement : ${slug}` : ""}
         </p>
       </div>
@@ -86,13 +94,14 @@ export default function RessourcesPage() {
         <Button>Ajouter</Button>
       </form>
 
-      <Bloc titre="Frigos & enceintes" items={frigos} kind="frigo" label={(i) => i.nom ?? ""} onDel={supprimer} />
+      <Bloc titre="Frigos & enceintes" items={frigos} kind="frigo" label={(i) => i.nom ?? ""} onDel={supprimer} onEdit={modifier} />
       <Bloc
         titre="Friteuses"
         items={friteuses}
         kind="friteuse"
         label={(i) => i.bac ?? ""}
         onDel={supprimer}
+        onEdit={modifier}
       />
       <Bloc
         titre="Surfaces de nettoyage"
@@ -100,6 +109,7 @@ export default function RessourcesPage() {
         kind="surface"
         label={(i) => i.zone ?? ""}
         onDel={supprimer}
+        onEdit={modifier}
       />
 
       <p className="text-sm text-slate-500">
@@ -123,13 +133,18 @@ function Bloc({
   kind,
   label,
   onDel,
+  onEdit,
 }: {
   titre: string;
   items: Item[];
   kind: string;
   label: (i: Item) => string;
   onDel: (kind: string, id: string) => void;
+  onEdit: (kind: string, id: string, nom: string) => void;
 }) {
+  const [editId, setEditId] = useState<string | null>(null);
+  const [editNom, setEditNom] = useState("");
+
   return (
     <section className="space-y-2">
       <h2 className="font-serif text-lg font-semibold">{titre}</h2>
@@ -139,17 +154,44 @@ function Bloc({
         items.map((i) => (
           <article
             key={i.id}
-            className="flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white p-4"
+            className="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-4 sm:flex-row sm:items-center sm:justify-between"
           >
-            <div>
-              <p className="font-semibold">{label(i)}</p>
-              <Badge variant={i.actif ? "ok" : "warn"}>{i.actif ? "Actif" : "Retiré"}</Badge>
-            </div>
-            {i.actif ? (
-              <Button variant="ghost" onClick={() => onDel(kind, i.id)}>
-                Supprimer
-              </Button>
-            ) : null}
+            {editId === i.id ? (
+              <>
+                <Input value={editNom} onChange={(e) => setEditNom(e.target.value)} className="sm:max-w-sm" />
+                <div className="flex gap-2">
+                  <Button
+                    onClick={() => {
+                      if (editNom.trim()) onEdit(kind, i.id, editNom.trim());
+                      setEditId(null);
+                    }}
+                  >
+                    Enregistrer
+                  </Button>
+                  <Button variant="ghost" onClick={() => setEditId(null)}>
+                    Annuler
+                  </Button>
+                </div>
+              </>
+            ) : (
+              <>
+                <p className="font-semibold">{label(i)}</p>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setEditId(i.id);
+                      setEditNom(label(i));
+                    }}
+                  >
+                    Modifier
+                  </Button>
+                  <Button variant="ghost" onClick={() => onDel(kind, i.id)}>
+                    Supprimer
+                  </Button>
+                </div>
+              </>
+            )}
           </article>
         ))
       )}

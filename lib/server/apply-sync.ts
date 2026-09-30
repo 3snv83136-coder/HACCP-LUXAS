@@ -1,5 +1,7 @@
 import { prisma, writeAudit } from "@/lib/db";
 import { isTemperatureConforme } from "@/lib/conformity";
+import { DLC_NON_APPLICABLE } from "@/lib/dlc";
+import { huileAChanger } from "@/lib/huile-etat";
 import type { QueueItem } from "@/lib/types";
 import { nanoid } from "nanoid";
 
@@ -219,8 +221,13 @@ async function applyHuile(item: QueueItem) {
   if (existing) return;
   const etablissementId = String(p.etablissementId);
   const code = await ensureCode(String(p.codeOperateurId), etablissementId);
-  const polaires = Number(p.composesPolaires);
-  const action = String(p.action ?? "ok");
+  const action = String(p.action ?? "bonne");
+  const polairesRaw = Number(p.composesPolaires);
+  const polaires = Number.isFinite(polairesRaw)
+    ? polairesRaw
+    : action === "a_changer" || action === "vidange"
+      ? 100
+      : 0;
   const releve = await prisma.releveHuile.create({
     data: {
       clientUuid,
@@ -230,13 +237,14 @@ async function applyHuile(item: QueueItem) {
       codeOperateurId: code.id,
     },
   });
-  if (action === "vidange" || Boolean(p.horsSeuil)) {
+  if (huileAChanger(action, polaires) || Boolean(p.horsSeuil)) {
+    const huile = await prisma.huileFriture.findUnique({ where: { id: String(p.huileId) } });
     await prisma.nonConformite.create({
       data: {
         etablissementId,
         source: "huile",
         sourceId: releve.id,
-        constat: `Huile hors seuil — ${polaires} % de composés polaires.`,
+        constat: `Huile à changer — ${huile?.bac ?? "friteuse"}.`,
         gravite: "haute",
         statut: "ouvert",
       },
@@ -274,6 +282,9 @@ async function applyDestructionPlat(item: QueueItem) {
 
 async function applyLot(item: QueueItem) {
   const p = item.payload;
+  const dlcRaw = p.dlcSecondaire ? new Date(String(p.dlcSecondaire)) : null;
+  const dlc =
+    dlcRaw && !Number.isNaN(dlcRaw.getTime()) ? dlcRaw : DLC_NON_APPLICABLE;
   await prisma.lotProduit.create({
     data: {
       etablissementId: String(p.etablissementId),
@@ -281,7 +292,7 @@ async function applyLot(item: QueueItem) {
       produit: String(p.produit),
       lotSource: p.lotSource ? String(p.lotSource) : null,
       dateDebut: new Date(String(p.dateDebut ?? Date.now())),
-      dlcSecondaire: new Date(String(p.dlcSecondaire)),
+      dlcSecondaire: dlc,
       qrToken: String(p.qrToken ?? nanoid()),
       createdBy: String(p.createdBy ?? p.codeOperateurId ?? "terrain"),
     },

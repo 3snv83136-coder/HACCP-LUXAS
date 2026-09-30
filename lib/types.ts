@@ -65,6 +65,7 @@ export type HuileRef = {
   id: string;
   bac: string;
   dernierPolaires: number | null;
+  dernierAction: string | null;
   dernierAt: string | null;
 };
 

@@ -26,7 +26,7 @@ type Lot = {
   produit: string;
   type: string;
   lot: string | null;
-  dlc: string;
+  dlc: string | null;
 };
 
 type Nettoyage = {
@@ -76,7 +76,6 @@ export default function ProduitsPage() {
     produit: "",
     type: "ouverture",
     lotSource: "",
-    dlcSecondaire: "",
   });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -141,7 +140,7 @@ export default function ProduitsPage() {
       setError(json.error ?? "Impossible d’enregistrer le lot");
       return;
     }
-    setNouveau({ produit: "", type: "ouverture", lotSource: "", dlcSecondaire: "" });
+    setNouveau({ produit: "", type: "ouverture", lotSource: "" });
     await load();
   }
 
@@ -160,7 +159,7 @@ export default function ProduitsPage() {
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-teal-700">Traçabilité</p>
           <h1 className="mt-1 text-2xl font-semibold sm:text-3xl">Produits</h1>
           <p className="mt-1 max-w-2xl text-sm text-slate-500 sm:text-base">
-            Tout ce qui entre et ce qui est étiqueté : réceptions, lots, DLC et produits d’hygiène.
+            Tout ce qui entre et ce qui est étiqueté : réceptions, lots et produits d’hygiène.
             Filtre par jour, semaine ou mois.
           </p>
         </div>
@@ -276,18 +275,7 @@ export default function ProduitsPage() {
               onChange={(e) => setNouveau({ ...nouveau, lotSource: e.target.value })}
             />
           </label>
-          <label className="space-y-1.5">
-            <Label>DLC secondaire</Label>
-            <Input
-              type="datetime-local"
-              value={nouveau.dlcSecondaire}
-              onChange={(e) => setNouveau({ ...nouveau, dlcSecondaire: e.target.value })}
-            />
-          </label>
         </div>
-        <p className="text-xs text-slate-400">
-          Si la DLC est vide, le délai PMS (ouverture / décongélation) est appliqué.
-        </p>
         <Button className="w-full sm:w-auto" disabled={saving || !nouveau.produit}>
           {saving ? "…" : "Enregistrer le lot"}
         </Button>
@@ -326,28 +314,25 @@ export default function ProduitsPage() {
 
       {showLots ? (
         <section className="space-y-3">
-          <h2 className="text-lg font-semibold">Lots & DLC secondaires ({lots.length})</h2>
+          <h2 className="text-lg font-semibold">Lots étiquetés ({lots.length})</h2>
           {lots.length === 0 ? (
             <p className="rounded-3xl bg-slate-50 p-4 text-sm text-slate-500">Aucun lot sur cette période.</p>
           ) : (
-            lots.map((l) => {
-              const perime = new Date(l.dlc) < new Date();
-              return (
+            lots.map((l) => (
                 <article key={l.id} className="rounded-3xl border border-slate-200 bg-white p-4">
                   <div className="flex flex-wrap items-start justify-between gap-2">
                     <div className="min-w-0">
                       <p className="font-semibold">{l.produit}</p>
                       <p className="text-sm text-slate-500">
                         {l.type}
-                        {l.lot ? ` · source ${l.lot}` : ""} · DLC {new Date(l.dlc).toLocaleString("fr-FR")}
+                        {l.lot ? ` · source ${l.lot}` : ""}
                       </p>
                       <p className="mt-1 text-xs text-slate-400">{formatDateHeure(l.at)}</p>
                     </div>
-                    <Badge variant={perime ? "nok" : "ok"}>{perime ? "DLC dépassée" : "En cours"}</Badge>
+                    <Badge variant="ok">Enregistré</Badge>
                   </div>
                 </article>
-              );
-            })
+            ))
           )}
         </section>
       ) : null}

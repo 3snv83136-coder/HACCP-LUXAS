@@ -1,11 +1,70 @@
-import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
+import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFPage } from "pdf-lib";
 import { prisma } from "@/lib/db";
+import { libelleEtatHuile } from "@/lib/huile-etat";
 import { formatDateHeure, formatTemp } from "@/lib/utils";
 
 export type FiltreDossier = {
   membreId?: string;
   types?: string[];
 };
+
+const PAGE_W = 595;
+const PAGE_H = 842;
+const MARGIN_X = 40;
+const MARGIN_BOTTOM = 48;
+const HEADER_H = 52;
+const TEAL = rgb(0.059, 0.463, 0.431);
+const SLATE = rgb(0.07, 0.09, 0.12);
+const MUTED = rgb(0.39, 0.45, 0.52);
+const LINE = rgb(0.86, 0.89, 0.91);
+const ROW_ALT = rgb(0.96, 0.98, 0.98);
+const WHITE = rgb(1, 1, 1);
+
+function win(text: string): string {
+  return text
+    .replace(/[’‘]/g, "'")
+    .replace(/[“”]/g, '"')
+    .replace(/[–—]/g, "-")
+    .replace(/€/g, "EUR")
+    .replace(/œ/g, "oe")
+    .replace(/Œ/g, "OE")
+    .replace(/æ/g, "ae")
+    .replace(/Æ/g, "AE")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^\x09\x0A\x0D\x20-\x7E]/g, " ");
+}
+
+function wrap(text: string, font: PDFFont, size: number, maxWidth: number): string[] {
+  const raw = win(text).trim() || "-";
+  const words = raw.split(/\s+/);
+  const lines: string[] = [];
+  let cur = "";
+  for (const word of words) {
+    const next = cur ? `${cur} ${word}` : word;
+    if (font.widthOfTextAtSize(next, size) <= maxWidth) {
+      cur = next;
+      continue;
+    }
+    if (cur) lines.push(cur);
+    if (font.widthOfTextAtSize(word, size) <= maxWidth) {
+      cur = word;
+    } else {
+      let chunk = "";
+      for (const ch of word) {
+        const trial = chunk + ch;
+        if (font.widthOfTextAtSize(trial, size) <= maxWidth) chunk = trial;
+        else {
+          if (chunk) lines.push(chunk);
+          chunk = ch;
+        }
+      }
+      cur = chunk;
+    }
+  }
+  if (cur) lines.push(cur);
+  return lines.length ? lines : ["-"];
+}
 
 export async function genererDossierSanitaire(
   etablissementId: string,
@@ -78,93 +137,264 @@ export async function genererDossierSanitaire(
   const pdf = await PDFDocument.create();
   const font = await pdf.embedFont(StandardFonts.Helvetica);
   const bold = await pdf.embedFont(StandardFonts.HelveticaBold);
-  let page = pdf.addPage([595, 842]);
-  let y = 800;
+  let page!: PDFPage;
+  let y = 0;
+  let pageNum = 0;
 
-  const ensure = () => {
-    if (y < 60) {
-      page = pdf.addPage([595, 842]);
-      y = 800;
+  const footer = (target: PDFPage, n: number) => {
+    target.drawLine({
+      start: { x: MARGIN_X, y: 34 },
+      end: { x: PAGE_W - MARGIN_X, y: 34 },
+      thickness: 0.5,
+      color: LINE,
+    });
+    target.drawText(win("Document inalterable - les releves ne sont ni modifies ni supprimes."), {
+      x: MARGIN_X,
+      y: 20,
+      size: 7.5,
+      font,
+      color: MUTED,
+    });
+    const label = `Page ${n}`;
+    target.drawText(label, {
+      x: PAGE_W - MARGIN_X - font.widthOfTextAtSize(label, 8),
+      y: 20,
+      size: 8,
+      font,
+      color: MUTED,
+    });
+  };
+
+  const addPage = () => {
+    if (pageNum > 0) footer(page, pageNum);
+    page = pdf.addPage([PAGE_W, PAGE_H]);
+    pageNum += 1;
+    page.drawRectangle({
+      x: 0,
+      y: PAGE_H - HEADER_H,
+      width: PAGE_W,
+      height: HEADER_H,
+      color: TEAL,
+    });
+    page.drawText(win("SANITRACE"), {
+      x: MARGIN_X,
+      y: PAGE_H - 22,
+      size: 9,
+      font: bold,
+      color: WHITE,
+    });
+    page.drawText(win("Dossier sanitaire HACCP"), {
+      x: MARGIN_X,
+      y: PAGE_H - 38,
+      size: 12,
+      font: bold,
+      color: WHITE,
+    });
+    const nom = win(etab.nom);
+    const nomW = font.widthOfTextAtSize(nom, 9);
+    page.drawText(nom, {
+      x: PAGE_W - MARGIN_X - nomW,
+      y: PAGE_H - 30,
+      size: 9,
+      font,
+      color: WHITE,
+    });
+    y = PAGE_H - HEADER_H - 22;
+  };
+
+  const ensure = (need = 24) => {
+    if (y < MARGIN_BOTTOM + need) addPage();
+  };
+
+  const title = (text: string) => {
+    ensure(36);
+    y -= 6;
+    page.drawRectangle({
+      x: MARGIN_X,
+      y: y - 4,
+      width: 4,
+      height: 16,
+      color: TEAL,
+    });
+    page.drawText(win(text), {
+      x: MARGIN_X + 12,
+      y,
+      size: 12,
+      font: bold,
+      color: SLATE,
+    });
+    y -= 20;
+  };
+
+  const para = (text: string, size = 9, useBold = false, color = MUTED) => {
+    const f = useBold ? bold : font;
+    const lines = wrap(text, f, size, PAGE_W - MARGIN_X * 2);
+    for (const line of lines) {
+      ensure(size + 6);
+      page.drawText(line, { x: MARGIN_X, y, size, font: f, color });
+      y -= size + 5;
     }
   };
 
-  const line = (text: string, size = 10, useBold = false) => {
-    ensure();
-    page.drawText(text.slice(0, 110), {
-      x: 40,
-      y,
-      size,
-      font: useBold ? bold : font,
-      color: rgb(0.07, 0.09, 0.12),
+  const table = (headers: string[], rows: string[][], widths: number[]) => {
+    const size = 8;
+    const cellPad = 4;
+    const drawHeader = () => {
+      const h = 18;
+      ensure(h + 8);
+      page.drawRectangle({
+        x: MARGIN_X,
+        y: y - 4,
+        width: PAGE_W - MARGIN_X * 2,
+        height: h,
+        color: TEAL,
+      });
+      let x = MARGIN_X + cellPad;
+      headers.forEach((hText, i) => {
+        page.drawText(win(hText), {
+          x,
+          y: y + 2,
+          size,
+          font: bold,
+          color: WHITE,
+        });
+        x += widths[i] ?? 80;
+      });
+      y -= h + 2;
+    };
+
+    drawHeader();
+    if (rows.length === 0) {
+      para("Aucun enregistrement sur la periode.");
+      y -= 6;
+      return;
+    }
+
+    rows.forEach((row, rowIndex) => {
+      const cellLines = row.map((cell, i) => wrap(cell, font, size, (widths[i] ?? 80) - cellPad * 2));
+      const lineCount = Math.max(...cellLines.map((l) => l.length), 1);
+      const rowH = lineCount * (size + 3) + 8;
+      if (y - rowH < MARGIN_BOTTOM) {
+        addPage();
+        drawHeader();
+      }
+      if (rowIndex % 2 === 0) {
+        page.drawRectangle({
+          x: MARGIN_X,
+          y: y - rowH + 10,
+          width: PAGE_W - MARGIN_X * 2,
+          height: rowH,
+          color: ROW_ALT,
+        });
+      }
+      let x = MARGIN_X + cellPad;
+      cellLines.forEach((lines, i) => {
+        lines.forEach((line, li) => {
+          page.drawText(line, {
+            x,
+            y: y - li * (size + 3),
+            size,
+            font,
+            color: SLATE,
+          });
+        });
+        x += widths[i] ?? 80;
+      });
+      y -= rowH;
     });
-    y -= size + 6;
+    y -= 10;
   };
 
-  line("SANITRACE — Dossier sanitaire", 16, true);
-  line(etab.nom, 12, true);
-  line(`Periode : ${depuis.toLocaleDateString("fr-FR")} - ${jusqua.toLocaleDateString("fr-FR")}`);
-  if (membre) line(`Employe : ${membre.utilisateur.prenom} ${membre.utilisateur.nom}`);
-  line(`Filtres : ${Array.from(types).join(", ")}`);
-  line(`Document inalterable genere le ${new Date().toLocaleString("fr-FR")}`);
-  line("Ce document n'est pas un conseil juridique. Seuils issus du PMS parametre.", 8);
+  addPage();
+  para(etab.nom, 14, true, SLATE);
+  para(
+    `Periode : ${depuis.toLocaleDateString("fr-FR")} - ${jusqua.toLocaleDateString("fr-FR")}`,
+    10,
+    false,
+    SLATE,
+  );
+  if (membre) {
+    para(`Employe : ${membre.utilisateur.prenom} ${membre.utilisateur.nom}`, 10, false, SLATE);
+  }
+  para(`Rubriques : ${Array.from(types).join(" · ")}`, 9);
+  para(`Genere le ${new Date().toLocaleString("fr-FR")} - seuils issus du PMS parametre.`, 8);
   y -= 8;
 
   if (types.has("releves")) {
-    line("1. Releves de temperatures", 12, true);
-    if (releves.length === 0) line("Aucun releve.");
-    for (const r of releves) {
-      const nom = `${r.codeOperateur.membre.utilisateur.prenom} ${r.codeOperateur.membre.utilisateur.nom}`;
-      const cible = r.equipement?.nom ?? r.pointControle?.libelle ?? "-";
-      line(`${formatDateHeure(r.createdAt)} | ${cible} | ${formatTemp(r.valeur)} | ${r.conforme ? "OK" : "NOK"} | ${nom}`);
-    }
-    y -= 8;
+    title("1. Releves de temperatures");
+    table(
+      ["Date", "Cible", "T°", "Resultat", "Operateur"],
+      releves.map((r) => {
+        const nom = `${r.codeOperateur.membre.utilisateur.prenom} ${r.codeOperateur.membre.utilisateur.nom}`;
+        const cible = r.equipement?.nom ?? r.pointControle?.libelle ?? "-";
+        return [formatDateHeure(r.createdAt), cible, formatTemp(r.valeur), r.conforme ? "OK" : "NOK", nom];
+      }),
+      [95, 145, 60, 60, 155],
+    );
   }
 
   if (types.has("receptions")) {
-    line("2. Receptions marchandises", 12, true);
-    if (receptions.length === 0) line("Aucune reception.");
-    for (const r of receptions) {
-      line(`${formatDateHeure(r.createdAt)} | ${r.fournisseur} | ${r.produit} | ${r.conforme ? "OK" : "REFUS"}`);
-    }
-    y -= 8;
+    title("2. Receptions marchandises");
+    table(
+      ["Date", "Fournisseur", "Produit", "Resultat"],
+      receptions.map((r) => [
+        formatDateHeure(r.createdAt),
+        r.fournisseur,
+        r.produit,
+        r.conforme ? "OK" : "REFUS",
+      ]),
+      [95, 150, 180, 90],
+    );
   }
 
   if (types.has("menage")) {
-    line("3. Plan de nettoyage — executions", 12, true);
-    if (menages.length === 0) line("Aucune execution.");
-    for (const m of menages) {
-      line(`${formatDateHeure(m.faitAt)} | ${m.tache.zone}`);
-    }
-    y -= 8;
+    title("3. Plan de nettoyage");
+    table(
+      ["Date", "Zone"],
+      menages.map((m) => [formatDateHeure(m.faitAt), m.tache.zone]),
+      [120, 395],
+    );
   }
 
   if (types.has("nc")) {
-    line("4. Non-conformites", 12, true);
-    if (ncs.length === 0) line("Aucune non-conformite.");
-    for (const nc of ncs) {
-      line(`${formatDateHeure(nc.createdAt)} | ${nc.statut} | ${nc.gravite} | ${nc.constat}`);
-    }
-    y -= 8;
+    title("4. Non-conformites");
+    table(
+      ["Date", "Statut", "Gravite", "Constat"],
+      ncs.map((nc) => [formatDateHeure(nc.createdAt), nc.statut, nc.gravite, nc.constat]),
+      [90, 70, 70, 285],
+    );
   }
 
   if (types.has("plats")) {
-    line("5. Plats temoins", 12, true);
-    if (plats.length === 0) line("Aucun plat temoin.");
-    for (const p of plats) {
-      line(`${p.plat} | service ${p.serviceDate.toLocaleDateString("fr-FR")} | destruction ${p.destructionPrevue.toLocaleDateString("fr-FR")} | ${p.detruitAt ? "detruit" : "en cours"}`);
-    }
-    y -= 8;
+    title("5. Plats temoins");
+    table(
+      ["Plat", "Service", "Destruction", "Etat"],
+      plats.map((p) => [
+        p.plat,
+        p.serviceDate.toLocaleDateString("fr-FR"),
+        p.destructionPrevue.toLocaleDateString("fr-FR"),
+        p.detruitAt ? "Detruit" : "En cours",
+      ]),
+      [175, 100, 110, 130],
+    );
   }
 
   if (types.has("huiles")) {
-    line("6. Huiles de friture", 12, true);
-    if (huiles.length === 0) line("Aucun releve huile.");
-    for (const h of huiles) {
-      line(`${formatDateHeure(h.createdAt)} | ${h.huile.bac} | ${h.composesPolaires} % | ${h.action}`);
-    }
+    title("6. Huiles de friture");
+    table(
+      ["Date", "Bac", "Etat"],
+      huiles.map((h) => [
+        formatDateHeure(h.createdAt),
+        h.huile.bac,
+        libelleEtatHuile(h.action, h.composesPolaires),
+      ]),
+      [120, 180, 215],
+    );
   }
 
-  y -= 16;
-  line("Journal append-only : les releves ne sont ni modifies ni supprimes.", 8);
+  y -= 4;
+  para("Ce document n'est pas un conseil juridique.", 8);
+
+  footer(page, pageNum);
   return pdf.save();
 }

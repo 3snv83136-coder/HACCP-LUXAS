@@ -21,7 +21,6 @@ export default function TracabilitePage() {
   const [photo, setPhoto] = useState<string | null>(null);
   const [produit, setProduit] = useState("");
   const [lot, setLot] = useState("");
-  const [dlc, setDlc] = useState("");
   const [type, setType] = useState("ouverture");
   const [items, setItems] = useState<Capture[]>([]);
   const [printItem, setPrintItem] = useState<Capture | null>(null);
@@ -36,16 +35,15 @@ export default function TracabilitePage() {
     void load();
   }, []);
 
-  async function enregistrer() {
+  async function enregistrer(imprimer: boolean) {
     if (!photo || !produit) return;
     await fetch("/api/etiquettes", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ produit, lot, dlc, type, photoUrl: photo, imprimer: true }),
+      body: JSON.stringify({ produit, lot, type, photoUrl: photo, imprimer }),
     });
     setProduit("");
     setLot("");
-    setDlc("");
     setPhoto(null);
     await load();
   }
@@ -61,8 +59,8 @@ export default function TracabilitePage() {
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-teal-700">Traçabilité</p>
         <h1 className="mt-1 font-serif text-3xl font-semibold">Photo → étiquette</h1>
         <p className="mt-1 max-w-2xl text-slate-500">
-          Photographie l’étiquette d’origine. L’app la recadre au format imprimante 58×40 mm et
-          l’envoie à la file d’impression, utilisable depuis n’importe quel appareil.
+          Photographie l’étiquette d’origine. Enregistre-la au dossier, puis envoie-la à l’imprimante
+          seulement si besoin.
         </p>
       </div>
 
@@ -70,7 +68,7 @@ export default function TracabilitePage() {
         className="no-print space-y-4 rounded-3xl border border-slate-200 bg-white p-4 sm:p-5"
         onSubmit={(e) => {
           e.preventDefault();
-          void enregistrer();
+          void enregistrer(false);
         }}
       >
         <PhotoCapture value={photo} onChange={setPhoto} label="Photo de l’étiquette" />
@@ -92,17 +90,21 @@ export default function TracabilitePage() {
               <option value="reception">Réception</option>
             </select>
           </label>
-          <label className="space-y-1.5">
+          <label className="space-y-1.5 sm:col-span-2">
             <Label>Lot</Label>
             <Input value={lot} onChange={(e) => setLot(e.target.value)} />
           </label>
-          <label className="space-y-1.5">
-            <Label>DLC</Label>
-            <Input value={dlc} onChange={(e) => setDlc(e.target.value)} placeholder="ex. 24/09 12:00" />
-          </label>
         </div>
-        <div className="flex flex-col gap-2 sm:flex-row">
-          <Button disabled={!photo || !produit}>Enregistrer et envoyer à l’imprimante</Button>
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+          <Button disabled={!photo || !produit}>Enregistrer</Button>
+          <Button
+            type="button"
+            variant="outline"
+            disabled={!photo || !produit}
+            onClick={() => void enregistrer(true)}
+          >
+            Envoyer à l’imprimante
+          </Button>
           <Link href="/station-impression" className="inline-flex h-11 items-center text-sm text-teal-800">
             Ouvrir la station d’impression →
           </Link>
@@ -120,7 +122,6 @@ export default function TracabilitePage() {
               <p className="text-sm text-slate-500">
                 {item.type}
                 {item.lot ? ` · lot ${item.lot}` : ""}
-                {item.dlc ? ` · DLC ${item.dlc}` : ""}
               </p>
               <Button variant="outline" className="mt-3" onClick={() => imprimer(item)}>
                 Imprimer 58×40 mm
@@ -136,10 +137,7 @@ export default function TracabilitePage() {
           <img src={printItem.photoUrl} alt="" className="h-12 w-full object-cover" />
           <p className="mt-1 text-[10px] font-bold leading-tight">{printItem.produit}</p>
           <p className="text-[8px] uppercase">{printItem.type}</p>
-          <p className="font-mono text-[8px]">
-            {printItem.lot ? `Lot ${printItem.lot} · ` : ""}
-            {printItem.dlc ? `DLC ${printItem.dlc}` : ""}
-          </p>
+          <p className="font-mono text-[8px]">{printItem.lot ? `Lot ${printItem.lot}` : ""}</p>
         </div>
       ) : null}
     </div>

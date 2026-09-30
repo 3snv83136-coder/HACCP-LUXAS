@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { BackArrow } from "@/components/navigation/back-arrow";
 
 type Job = {
   id: string;
@@ -43,6 +44,7 @@ export default function StationImpressionPage() {
   return (
     <main className="etiquette-print-root mx-auto min-h-dvh max-w-3xl px-4 py-8">
       <div className="no-print space-y-4">
+        <BackArrow />
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-teal-700">Station</p>
         <h1 className="font-serif text-3xl font-semibold">Imprimante d’étiquettes</h1>
         <p className="text-slate-500">

@@ -1,9 +1,8 @@
 import { randomUUID } from "crypto";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { dlcSecondaire } from "@/lib/conformity";
+import { DLC_NON_APPLICABLE, dlcEstAffichee } from "@/lib/dlc";
 import { plageHygiene, type PeriodeHygiene } from "@/lib/hygiene";
-import { PARAM_KEYS } from "@/lib/params";
 import { listEtablissements, etablissementDeLaSession } from "@/lib/server/etab";
 
 export const dynamic = "force-dynamic";
@@ -31,12 +30,9 @@ export async function GET(request: Request) {
     prisma.lotProduit.findMany({
       where: {
         etablissementId: etab.id,
-        OR: [
-          { createdAt: range },
-          { AND: [{ dateDebut: { lte: end } }, { dlcSecondaire: { gte: start } }] },
-        ],
+        createdAt: range,
       },
-      orderBy: { dlcSecondaire: "asc" },
+      orderBy: { createdAt: "desc" },
     }),
     prisma.produitNettoyage.findMany({
       where: { etablissementId: etab.id },
@@ -72,7 +68,7 @@ export async function GET(request: Request) {
       produit: l.produit,
       type: l.type,
       lot: l.lotSource,
-      dlc: l.dlcSecondaire.toISOString(),
+      dlc: dlcEstAffichee(l.dlcSecondaire) ? l.dlcSecondaire.toISOString() : null,
       qrToken: l.qrToken,
     })),
     nettoyage: nettoyage.map((p) => ({
@@ -100,18 +96,7 @@ export async function POST(request: Request) {
 
   const type = body.type?.trim() || "ouverture";
   const saisie = body.dlcSecondaire ? new Date(body.dlcSecondaire) : null;
-  let dlc = saisie && !Number.isNaN(saisie.getTime()) ? saisie : null;
-  if (!dlc) {
-    const rows = await prisma.parametre.findMany({
-      where: { organisationId: etab.organisationId, cle: { in: Object.values(PARAM_KEYS) } },
-    });
-    const params = Object.fromEntries(rows.map((r) => [r.cle, r.valeur]));
-    const kind =
-      type === "decongelation" || type === "fabrication" || type === "ouverture"
-        ? type
-        : "ouverture";
-    dlc = dlcSecondaire(kind, new Date(), params);
-  }
+  const dlc = saisie && !Number.isNaN(saisie.getTime()) ? saisie : DLC_NON_APPLICABLE;
   const lot = await prisma.lotProduit.create({
     data: {
       etablissementId: etab.id,

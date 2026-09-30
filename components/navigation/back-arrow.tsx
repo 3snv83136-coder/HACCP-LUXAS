@@ -1,26 +1,41 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-function parentHref(pathname: string): string | null {
-  if (pathname === "/") return null;
-  if (pathname === "/terrain" || pathname === "/backoffice") return "/";
+function parentHref(pathname: string): string {
+  if (pathname === "/terrain" || pathname === "/backoffice" || pathname === "/hygiene") return "/";
+  if (pathname === "/createurs" || pathname === "/createurs/connexion") return "/";
+  if (pathname === "/station-impression") return "/";
+  if (pathname === "/connexion" || pathname === "/creer-compte") return "/";
+  if (pathname.startsWith("/acces/")) return "/";
   if (pathname.startsWith("/terrain/")) return "/terrain";
   if (pathname.startsWith("/backoffice/")) return "/backoffice";
+  if (pathname.startsWith("/hygiene/")) return "/hygiene";
+  if (pathname.startsWith("/createurs/")) return "/createurs";
   return "/";
 }
 
 export function BackArrow({ className }: { className?: string }) {
+  const router = useRouter();
   const pathname = usePathname();
-  const href = parentHref(pathname);
-  if (!href) return null;
+  if (pathname === "/") return null;
+
+  function goBack() {
+    const ref = typeof document !== "undefined" ? document.referrer : "";
+    const sameOrigin = Boolean(ref) && ref.startsWith(window.location.origin);
+    if (sameOrigin && window.history.length > 1) {
+      router.back();
+      return;
+    }
+    router.push(parentHref(pathname));
+  }
 
   return (
-    <Link
-      href={href}
+    <button
+      type="button"
+      onClick={goBack}
       aria-label="Retour"
       className={cn(
         "inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-800 shadow-sm hover:bg-slate-50",
@@ -28,6 +43,6 @@ export function BackArrow({ className }: { className?: string }) {
       )}
     >
       <ArrowLeft className="h-5 w-5" strokeWidth={2.4} />
-    </Link>
+    </button>
   );
 }
