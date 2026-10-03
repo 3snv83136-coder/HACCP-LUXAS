@@ -1,4 +1,4 @@
-import { redirigerLibre } from "@/lib/server/acces-libre";
+import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -6,20 +6,16 @@ export const runtime = "nodejs";
 function dest(request: Request) {
   const url = new URL(request.url);
   const next = url.searchParams.get("next");
-  if (next && next.startsWith("/") && !next.startsWith("//")) return next;
-  return "/backoffice";
+  if (next && next.startsWith("/") && !next.startsWith("//")) {
+    return `/connexion?next=${encodeURIComponent(next)}`;
+  }
+  return "/connexion";
 }
 
 export async function GET(request: Request) {
-  return redirigerLibre(request, dest(request));
+  return NextResponse.redirect(new URL(dest(request), request.url));
 }
 
 export async function POST(request: Request) {
-  const form = await request.formData().catch(() => null);
-  const fromForm = form ? String(form.get("next") ?? "") : "";
-  const next =
-    fromForm.startsWith("/") && !fromForm.startsWith("//")
-      ? fromForm
-      : dest(request);
-  return redirigerLibre(request, next);
+  return NextResponse.redirect(new URL(dest(request), request.url));
 }

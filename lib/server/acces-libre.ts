@@ -1,20 +1,9 @@
 import { prisma } from "@/lib/db";
 import { hashCode } from "@/lib/crypto";
 import { SESSION_COOKIE, signSession, type SessionPayload } from "@/lib/auth/session";
-import { CREATEUR_COOKIE, signCreateur, type CreateurPayload } from "@/lib/auth/createur";
 import { optionsCookieAuth } from "@/lib/auth/cookie";
 import type { SessionOperateur } from "@/lib/types";
 import { NextResponse } from "next/server";
-
-export function createurLibre(): CreateurPayload {
-  return {
-    createurId: "qg",
-    email: "qg@sanitrace",
-    prenom: "Q.G.",
-    nom: "Sanitrace",
-    exp: Date.now() + 24 * 3600 * 1000,
-  };
-}
 
 export async function sessionLibre(): Promise<SessionPayload | null> {
   const membre =
@@ -87,12 +76,5 @@ export async function redirigerLibre(request: Request, dest: string) {
   if (session) {
     res.cookies.set(SESSION_COOKIE, await signSession(payloadSession(session)), optionsCookieAuth());
   }
-  const token = await signCreateur({
-    createurId: "qg",
-    email: "qg@sanitrace",
-    prenom: "Q.G.",
-    nom: "Sanitrace",
-  });
-  res.cookies.set(CREATEUR_COOKIE, token, optionsCookieAuth(60 * 60 * 24));
   return res;
 }

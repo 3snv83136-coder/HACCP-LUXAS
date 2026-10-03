@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { AccesDashboardForm } from "@/components/admin/acces-dashboard-form";
 import { Button } from "@/components/ui/button";
 
 type Parametre = { id: string; cle: string; valeur: string };
@@ -34,6 +35,7 @@ export default function ParametresPage() {
           Rien n’est codé en dur. Ces valeurs alimentent OK/NOK, DLC secondaires et rappels.
         </p>
       </div>
+      <AccesDashboardForm />
       <div className="overflow-hidden rounded-3xl bg-white shadow-sm">
         {params.map((p) => (
           <div key={p.id} className="flex flex-col gap-2 border-b border-slate-100 px-5 py-4 sm:flex-row sm:items-center">

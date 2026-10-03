@@ -75,7 +75,7 @@ export function BackofficeShell({ children }: { children: ReactNode }) {
 
   async function logout() {
     await fetch("/api/auth/logout", { method: "POST" });
-    router.replace("/connexion");
+    router.replace("/");
     router.refresh();
   }
 

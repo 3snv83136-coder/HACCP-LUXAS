@@ -13,7 +13,7 @@ export default function HygieneLayout({ children }: { children: ReactNode }) {
 
   async function quit() {
     await fetch("/api/auth/logout", { method: "POST" });
-    router.replace("/acces/hygiene");
+    router.replace("/");
     router.refresh();
   }
 

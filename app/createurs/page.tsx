@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Building2, Tags, Thermometer, Trash2, Users } from "lucide-react";
+import { AccesDashboardForm } from "@/components/admin/acces-dashboard-form";
 import { BrandLogo } from "@/components/brand/logo";
 import { BackArrow } from "@/components/navigation/back-arrow";
 import { Button } from "@/components/ui/button";
@@ -42,12 +43,16 @@ export default function CreateursDashboardPage() {
 
   const charger = useCallback(async () => {
     const res = await fetch("/api/createurs/etablissements");
+    if (res.status === 401) {
+      router.replace("/");
+      return;
+    }
     if (!res.ok) {
       setError("Impossible de charger les établissements");
       return;
     }
     setData((await res.json()) as Payload);
-  }, []);
+  }, [router]);
 
   useEffect(() => {
     void charger();
@@ -126,6 +131,10 @@ export default function CreateursDashboardPage() {
         <p className="font-mono text-xs uppercase tracking-[0.22em] text-amber-200/70">
           Tous les établissements · suppression définitive possible
         </p>
+
+        <div className="mt-6">
+          <AccesDashboardForm variant="sombre" />
+        </div>
 
         <div className="mt-6 grid gap-4 sm:grid-cols-3">
           <Carte label="Établissements" valeur={data?.synthese.total ?? "—"} />

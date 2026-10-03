@@ -144,7 +144,7 @@ export function StarWarsAccueil() {
             Terrain
           </Link>
           <Link
-            href="/backoffice"
+            href="/connexion"
             className="flex-1 rounded-full border-2 border-[#4bd5ee] px-5 py-3 text-center text-sm font-semibold uppercase tracking-[0.2em] text-[#4bd5ee] hover:bg-[#4bd5ee] hover:text-black"
           >
             Back-office

@@ -5,22 +5,23 @@ import { ArrowLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 function parentHref(pathname: string): string {
-  if (pathname === "/terrain" || pathname === "/backoffice" || pathname === "/hygiene") return "/";
-  if (pathname === "/createurs" || pathname === "/createurs/connexion") return "/";
-  if (pathname === "/station-impression") return "/";
+  if (pathname === "/accueil") return "/accueil";
+  if (pathname === "/terrain" || pathname === "/backoffice" || pathname === "/hygiene") return "/accueil";
+  if (pathname === "/createurs" || pathname === "/createurs/connexion") return "/accueil";
+  if (pathname === "/station-impression") return "/accueil";
   if (pathname === "/connexion" || pathname === "/creer-compte") return "/";
-  if (pathname.startsWith("/acces/")) return "/";
+  if (pathname.startsWith("/acces/")) return "/accueil";
   if (pathname.startsWith("/terrain/")) return "/terrain";
   if (pathname.startsWith("/backoffice/")) return "/backoffice";
   if (pathname.startsWith("/hygiene/")) return "/hygiene";
   if (pathname.startsWith("/createurs/")) return "/createurs";
-  return "/";
+  return "/accueil";
 }
 
 export function BackArrow({ className }: { className?: string }) {
   const router = useRouter();
   const pathname = usePathname();
-  if (pathname === "/") return null;
+  if (pathname === "/" || pathname === "/accueil") return null;
 
   function goBack() {
     const ref = typeof document !== "undefined" ? document.referrer : "";
