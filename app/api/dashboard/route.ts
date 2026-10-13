@@ -5,6 +5,7 @@ import { buildTachesDuJour } from "@/lib/tasks";
 import { etablissementDeLaSession, listEtablissements } from "@/lib/server/etab";
 import { prisma } from "@/lib/db";
 import { startOfDay } from "@/lib/utils";
+import { assurerClotureMensuelle } from "@/lib/server/cloture-mois";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -15,6 +16,7 @@ export async function GET(request: Request) {
   const etabs = current ? await listEtablissements(current.organisationId) : [];
   if (!current) return NextResponse.json({ error: "Aucun établissement" }, { status: 404 });
 
+  await assurerClotureMensuelle(current.id);
   const bootstrap = await getBootstrap(current.id);
   const taches = buildTachesDuJour(bootstrap, bootstrap.relevesRecents);
   const today = startOfDay();

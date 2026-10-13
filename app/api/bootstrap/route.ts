@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getBootstrap } from "@/lib/server/bootstrap";
+import { assurerClotureMensuelle } from "@/lib/server/cloture-mois";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -7,7 +8,9 @@ export const runtime = "nodejs";
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   try {
-    const payload = await getBootstrap(searchParams.get("etablissementId") ?? undefined);
+    const etabId = searchParams.get("etablissementId") ?? undefined;
+    if (etabId) await assurerClotureMensuelle(etabId);
+    const payload = await getBootstrap(etabId);
     return NextResponse.json(payload);
   } catch (error) {
     const message = error instanceof Error ? error.message : "Erreur bootstrap";

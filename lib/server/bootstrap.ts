@@ -23,6 +23,7 @@ export async function getBootstrap(etablissementId?: string): Promise<BootstrapP
     huiles,
     ncCount,
     plans,
+    notifications,
   ] = await Promise.all([
     prisma.parametre.findMany({ where: { organisationId: etab.organisationId } }),
     prisma.equipement.findMany({
@@ -70,6 +71,11 @@ export async function getBootstrap(etablissementId?: string): Promise<BootstrapP
       where: { etablissementId: etab.id, statut: { not: "cloture" } },
     }),
     prisma.planFrequence.findMany({ where: { etablissementId: etab.id, actif: true } }),
+    prisma.alerte.findMany({
+      where: { etablissementId: etab.id, lu: false },
+      orderBy: { createdAt: "desc" },
+      take: 10,
+    }),
   ]);
 
   const planByCible = new Map(plans.map((p) => [`${p.cibleType}:${p.cibleId}`, p]));
@@ -161,5 +167,11 @@ export async function getBootstrap(etablissementId?: string): Promise<BootstrapP
       dernierAt: h.releves[0]?.createdAt.toISOString() ?? null,
     })),
     nonConformitesOuvertes: ncCount,
+    notifications: notifications.map((n) => ({
+      id: n.id,
+      type: n.type,
+      message: n.message,
+      createdAt: n.createdAt.toISOString(),
+    })),
   };
 }

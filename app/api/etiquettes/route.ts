@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { codeEtiquette, genererCodeBarres } from "@/lib/etiquette-code";
 import { etablissementDeLaSession } from "@/lib/server/etab";
 import { sessionDepuisRequete } from "@/lib/server/session-request";
 
@@ -39,11 +40,14 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Photo trop lourde" }, { status: 400 });
   }
 
+  const lotSaisi = body.lot?.trim() || null;
+  const code = lotSaisi ? codeEtiquette("LOT", lotSaisi) : genererCodeBarres();
+
   const capture = await prisma.captureEtiquette.create({
     data: {
       etablissementId: etab.id,
       produit,
-      lot: body.lot?.trim() || null,
+      lot: lotSaisi ?? code,
       dlc: body.dlc?.trim() || null,
       type: body.type?.trim() || "ouverture",
       photoUrl,
@@ -61,12 +65,17 @@ export async function POST(request: Request) {
         lot: capture.lot,
         dlc: capture.dlc,
         type: capture.type,
-        photoUrl: capture.photoUrl,
+        photoUrl: null,
         statut: "attente",
       },
     });
     impressionId = job.id;
   }
 
-  return NextResponse.json({ ok: true, id: capture.id, impressionId });
+  return NextResponse.json({
+    ok: true,
+    id: capture.id,
+    impressionId,
+    code: codeEtiquette(capture.id, capture.lot),
+  });
 }

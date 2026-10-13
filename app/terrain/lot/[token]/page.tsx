@@ -66,7 +66,7 @@ export default function LotScanPage() {
       <div className="space-y-4">
         <h1 className="text-2xl font-semibold text-slate-900">QR inconnu</h1>
         <p className="text-slate-500">Aucune étiquette pour « {token} ».</p>
-        <Button variant="outline" onClick={() => router.push("/terrain/scan")}>
+        <Button variant="outline" onClick={() => router.push("/terrain/scan-etiquette")}>
           Retour au scan
         </Button>
       </div>
@@ -101,8 +101,8 @@ export default function LotScanPage() {
         <p className="mt-1">Enregistrée {formatDateHeure(item.createdAt)}</p>
         {auteur ? <p className="mt-1">Par {auteur}</p> : null}
       </div>
-      <Button variant="outline" className="w-full" onClick={() => router.push("/terrain/scan")}>
-        Scanner un autre QR
+      <Button variant="outline" className="w-full" onClick={() => router.push("/terrain/scan-etiquette")}>
+        Scanner une autre étiquette
       </Button>
     </div>
   );

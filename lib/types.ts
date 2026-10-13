@@ -129,4 +129,5 @@ export type BootstrapPayload = {
   platsTemoins: PlatTemoinRef[];
   huiles: HuileRef[];
   nonConformitesOuvertes: number;
+  notifications: { id: string; type: string; message: string; createdAt: string }[];
 };

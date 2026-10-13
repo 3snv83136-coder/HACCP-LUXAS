@@ -65,6 +65,23 @@ export async function collecterAlertes(etablissementId?: string): Promise<Alerte
 
   for (const etab of etabs) {
     await declarerRetardsMenage(etab.id);
+
+    const stockees = await prisma.alerte.findMany({
+      where: { etablissementId: etab.id, lu: false, type: "cloture_mois" },
+      orderBy: { createdAt: "desc" },
+      take: 5,
+    });
+    for (const a of stockees) {
+      out.push({
+        type: a.type,
+        gravite: "info",
+        message: a.message,
+        href: "/backoffice/exports",
+        etablissementId: etab.id,
+        etablissementNom: etab.nom,
+      });
+    }
+
     const bootstrap = await getBootstrap(etab.id);
     const taches = buildTachesDuJour(bootstrap, bootstrap.relevesRecents);
 

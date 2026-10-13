@@ -2,12 +2,16 @@ import { prisma } from "@/lib/db";
 import { formatDateHeure, formatTemp } from "@/lib/utils";
 import { PrintButton } from "@/components/backoffice/print-button";
 import { PdfDownloadButton } from "@/components/backoffice/pdf-download";
+import { sessionDepuisCookie } from "@/lib/server/session-request";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 export default async function ExportsPage() {
-  const etab = await prisma.etablissement.findFirst();
+  const session = await sessionDepuisCookie();
+  const etab = session
+    ? await prisma.etablissement.findUnique({ where: { id: session.etablissementId } })
+    : await prisma.etablissement.findFirst();
   const depuis = new Date();
   depuis.setDate(depuis.getDate() - 7);
 
@@ -32,7 +36,7 @@ export default async function ExportsPage() {
 
   const archives = etab
     ? await prisma.documentPms.findMany({
-        where: { etablissementId: etab.id, categorie: "export_ddpp" },
+        where: { etablissementId: etab.id, categorie: { in: ["export_ddpp", "archive_mois"] } },
         orderBy: { createdAt: "desc" },
         take: 10,
       })

@@ -1,5 +1,5 @@
 export function extraireQrSanitrace(raw: string): string {
-  const t = raw.trim();
+  const t = raw.trim().replace(/\*/g, "");
   try {
     const url = new URL(t);
     const parts = url.pathname.split("/").filter(Boolean);

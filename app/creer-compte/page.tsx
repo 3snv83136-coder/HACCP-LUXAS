@@ -8,11 +8,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { BackArrow } from "@/components/navigation/back-arrow";
 import { FONCTIONS_ETABLISSEMENT } from "@/lib/fonctions";
+import { LogoUpload } from "@/components/brand/logo-upload";
 
 export default function CreerComptePage() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const [form, setForm] = useState({
     nomEtablissement: "",
     siren: "",
@@ -32,7 +34,7 @@ export default function CreerComptePage() {
     const res = await fetch("/api/auth/inscription", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...form, resterConnecte: true }),
+      body: JSON.stringify({ ...form, logoUrl, resterConnecte: true }),
     });
     const data = (await res.json()) as { error?: string; slug?: string };
     setSaving(false);
@@ -82,6 +84,7 @@ export default function CreerComptePage() {
               onChange={(e) => setForm({ ...form, adresse: e.target.value })}
             />
           </Field>
+          <LogoUpload value={logoUrl} onChange={setLogoUrl} />
           <Field label="Adresse e-mail">
             <Input
               type="email"

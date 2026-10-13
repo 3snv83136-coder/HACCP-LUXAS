@@ -33,15 +33,21 @@ export function NumericPad({
     onChange(next);
   }
 
+  const keys = KEYS.filter((key) => {
+    if (key === "." && !allowDecimal) return false;
+    if (key === "-" && !allowNegative) return false;
+    return true;
+  });
+
   return (
     <div className="grid grid-cols-3 gap-2">
-      {KEYS.map((key) => (
+      {keys.map((key) => (
         <Button
           key={key}
           type="button"
           variant="outline"
           size="xl"
-          className={cn("font-mono text-2xl", key === "-" && !allowNegative && "opacity-30")}
+          className={cn("font-mono text-2xl", key === "0" && !allowDecimal && !allowNegative && "col-start-2")}
           onClick={() => press(key)}
         >
           {key === "-" ? "±" : key}

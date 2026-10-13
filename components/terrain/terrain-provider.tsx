@@ -15,7 +15,6 @@ import {
   listQueue,
   listRelevesLocal,
   loadBootstrap,
-  loadSession,
   saveBootstrap,
   saveSession,
 } from "@/lib/offline/idb";
@@ -71,6 +70,8 @@ export function TerrainProvider({ children }: { children: ReactNode }) {
   const [pending, setPending] = useState(0);
   const [pin, setPin] = useState("");
   const [identifiant, setIdentifiant] = useState("");
+  const [etabNom, setEtabNom] = useState<string | null>(null);
+  const [sessionResto, setSessionResto] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -100,27 +101,20 @@ export function TerrainProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     void (async () => {
-      const existing = await loadSession();
-      if (existing) {
-        setSession(existing);
-        await hydrate(existing);
-        setLoading(false);
-        return;
-      }
+      await clearSession();
       try {
         const res = await fetch("/api/auth/me");
         if (res.ok) {
-          const data = (await res.json()) as { session: SessionOperateur };
-          await saveSession(data.session);
-          setSession(data.session);
-          await hydrate(data.session);
+          const data = (await res.json()) as { session?: { etablissementNom?: string } };
+          setSessionResto(true);
+          setEtabNom(data.session?.etablissementNom ?? null);
         }
       } catch {
-        /* hors-ligne */
+        /* hors-ligne : le PIN pourra quand même viser l’identifiant saisi */
       }
       setLoading(false);
     })();
-  }, [hydrate]);
+  }, []);
 
   async function submitPin() {
     if (pin.length !== 4) return;
@@ -194,20 +188,22 @@ export function TerrainProvider({ children }: { children: ReactNode }) {
       <div className="mx-auto flex min-h-dvh max-w-md flex-col justify-between px-5 py-8">
         <div>
           <BackArrow />
-          <BrandLogo size={120} className="mt-6 rounded-3xl" />
+          <BrandLogo size={72} className="mt-6 rounded-3xl" />
           <p className="mt-6 text-xs font-semibold uppercase tracking-[0.22em] text-teal-700">
             Sanitrace · accès employés
           </p>
-          <h1 className="mt-3 font-serif text-3xl font-semibold tracking-tight text-slate-900">Ton code</h1>
+          <h1 className="mt-3 font-serif text-3xl font-semibold tracking-tight text-slate-900">Code PIN</h1>
           <p className="mt-2 text-sm text-slate-500">
-            Signature personnelle. Chaque relevé restera horodaté à ton nom.
+            {etabNom ? `${etabNom} — ` : ""}4 chiffres. Chaque action sera signée à ton nom.
           </p>
-          <input
-            value={identifiant}
-            onChange={(e) => setIdentifiant(e.target.value)}
-            placeholder="Slug ou e-mail de l’établissement"
-            className="mt-6 h-12 w-full rounded-2xl border border-slate-200 px-4 text-sm"
-          />
+          {!sessionResto ? (
+            <input
+              value={identifiant}
+              onChange={(e) => setIdentifiant(e.target.value)}
+              placeholder="Slug ou e-mail de l’établissement"
+              className="mt-6 h-12 w-full rounded-2xl border border-slate-200 px-4 text-sm"
+            />
+          ) : null}
           <p className="mt-8 text-center font-mono text-5xl tracking-[0.4em] text-slate-900">
             {pin.padEnd(4, "•")}
           </p>

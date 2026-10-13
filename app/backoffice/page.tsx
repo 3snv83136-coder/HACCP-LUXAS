@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { formatDateHeure } from "@/lib/utils";
+import { LogoUpload } from "@/components/brand/logo-upload";
+import { Button } from "@/components/ui/button";
 
 type Dashboard = {
   etablissement: { id: string; nom: string };
@@ -35,6 +37,8 @@ type Dashboard = {
 export default function DashboardPage() {
   const [data, setData] = useState<Dashboard | null>(null);
   const [etabId, setEtabId] = useState<string>("");
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [logoOk, setLogoOk] = useState<string | null>(null);
 
   useEffect(() => {
     const qs = etabId ? `?etablissementId=${etabId}` : "";
@@ -45,6 +49,24 @@ export default function DashboardPage() {
         if (!etabId) setEtabId(d.etablissement.id);
       });
   }, [etabId]);
+
+  useEffect(() => {
+    void fetch("/api/auth/me")
+      .then(async (res) => (res.ok ? res.json() : null))
+      .then((d: { session?: { logoUrl?: string | null } } | null) => {
+        if (d?.session) setLogoUrl(d.session.logoUrl ?? null);
+      })
+      .catch(() => undefined);
+  }, [etabId]);
+
+  async function enregistrerLogo() {
+    const res = await fetch("/api/etablissement", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ logoUrl }),
+    });
+    setLogoOk(res.ok ? "Logo enregistré." : "Impossible d’enregistrer le logo.");
+  }
 
   if (!data) return <p className="text-slate-500">Chargement du tableau de bord…</p>;
 
@@ -78,6 +100,18 @@ export default function DashboardPage() {
           ))}
         </select>
       </div>
+
+      <section className="rounded-3xl border border-slate-200 bg-white p-5">
+        <h2 className="text-lg font-semibold">Logo de l’établissement</h2>
+        <p className="mt-1 text-sm text-slate-500">Il s’affiche sur l’accès employé, le back-office et l’hygiène.</p>
+        <div className="mt-4 max-w-lg space-y-3">
+          <LogoUpload value={logoUrl} onChange={setLogoUrl} />
+          <Button type="button" onClick={() => void enregistrerLogo()}>
+            Enregistrer le logo
+          </Button>
+          {logoOk ? <p className="text-sm text-emerald-700">{logoOk}</p> : null}
+        </div>
+      </section>
 
       <div className="grid gap-3 sm:grid-cols-2">
         <Link
@@ -135,7 +169,13 @@ export default function DashboardPage() {
         ) : (
           <div className="space-y-2">
             {data.alertes.map((a, i) => (
-              <Link key={`${a.type}-${i}`} href={a.href} className="block rounded-2xl border border-slate-100 p-3">
+              <Link
+                key={`${a.type}-${i}`}
+                href={a.href}
+                className={`block rounded-2xl border p-3 ${
+                  a.type === "cloture_mois" ? "border-amber-200 bg-amber-50" : "border-slate-100"
+                }`}
+              >
                 <p className="text-xs uppercase text-slate-400">
                   {a.etablissementNom} · {a.type}
                 </p>

@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { codeBarresNormalise } from "@/lib/barcode";
 import { dlcEstAffichee } from "@/lib/dlc";
+import { codeEtiquette } from "@/lib/etiquette-code";
 import { extraireQrSanitrace, tokenEtiquette, tokenLot } from "@/lib/qr-token";
 import { etablissementDeLaSession } from "@/lib/server/etab";
 
@@ -32,9 +34,16 @@ export async function GET(request: Request) {
     });
   }
 
-  const capture = await prisma.captureEtiquette.findFirst({
-    where: { etablissementId: etab.id, id: tokenEtiquette(q) },
+  const captures = await prisma.captureEtiquette.findMany({
+    where: { etablissementId: etab.id },
+    orderBy: { createdAt: "desc" },
+    take: 250,
   });
+  const code = codeBarresNormalise(q);
+  const capture =
+    captures.find((c) => c.id === tokenEtiquette(q)) ??
+    captures.find((c) => (c.lot ?? "").toUpperCase() === code) ??
+    captures.find((c) => codeEtiquette(c.id, c.lot) === code);
   if (capture) {
     return NextResponse.json({
       kind: "etiquette",

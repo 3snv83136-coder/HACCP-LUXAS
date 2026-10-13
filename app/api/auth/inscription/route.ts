@@ -19,6 +19,7 @@ export async function POST(request: Request) {
     nom?: string;
     fonction?: string;
     resterConnecte?: boolean;
+    logoUrl?: string;
   };
 
   const nomEtablissement = (body.nomEtablissement ?? "").trim();
@@ -38,6 +39,9 @@ export async function POST(request: Request) {
   }
   if (motDePasse.length < 8) {
     return NextResponse.json({ error: "Le mot de passe doit faire au moins 8 caractères" }, { status: 400 });
+  }
+  if (body.logoUrl && body.logoUrl.length > 700_000) {
+    return NextResponse.json({ error: "Logo trop lourd (max ~500 Ko)" }, { status: 400 });
   }
 
   const existants = await prisma.utilisateur.findMany({
@@ -68,6 +72,7 @@ export async function POST(request: Request) {
       adresse,
       email,
       siren,
+      logoUrl: body.logoUrl,
     });
     utilisateur = await prisma.utilisateur.create({
       data: {
@@ -90,6 +95,7 @@ export async function POST(request: Request) {
     adresse,
     email,
     siren,
+    logoUrl: body.logoUrl,
   });
   await prisma.utilisateur.update({
     where: { id: utilisateur.id },

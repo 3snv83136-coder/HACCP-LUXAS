@@ -90,6 +90,7 @@ export async function creerEtablissement(input: {
   adresse?: string | null;
   email: string;
   siren?: string | null;
+  logoUrl?: string | null;
 }) {
   const etab = await prisma.etablissement.create({
     data: {
@@ -97,6 +98,7 @@ export async function creerEtablissement(input: {
       nom: input.nom,
       adresse: input.adresse?.trim() || null,
       email: input.email,
+      logoUrl: input.logoUrl || null,
       slug: slugifier(input.nom),
       typeCuisine: "restauration_commerciale",
     },
