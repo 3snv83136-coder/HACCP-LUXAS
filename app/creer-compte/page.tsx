@@ -7,44 +7,23 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { BackArrow } from "@/components/navigation/back-arrow";
+import { FONCTIONS_ETABLISSEMENT } from "@/lib/fonctions";
 
 export default function CreerComptePage() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
-  const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const [form, setForm] = useState({
     nomEtablissement: "",
+    siren: "",
     adresse: "",
     email: "",
-    telephone: "",
-    typeCuisine: "restauration_commerciale",
-    prenom: "",
-    nom: "",
-    code: "",
     motDePasse: "",
     motDePasse2: "",
+    prenom: "",
+    nom: "",
+    fonction: "gerant",
   });
-
-  async function onLogo(file: File) {
-    const reader = new FileReader();
-    reader.onload = () => {
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement("canvas");
-        const max = 320;
-        const scale = Math.min(1, max / Math.max(img.width, img.height));
-        canvas.width = Math.round(img.width * scale);
-        canvas.height = Math.round(img.height * scale);
-        const ctx = canvas.getContext("2d");
-        if (!ctx) return;
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        setLogoUrl(canvas.toDataURL("image/jpeg", 0.8));
-      };
-      img.src = String(reader.result);
-    };
-    reader.readAsDataURL(file);
-  }
 
   async function creer(e: FormEvent) {
     e.preventDefault();
@@ -53,7 +32,7 @@ export default function CreerComptePage() {
     const res = await fetch("/api/auth/inscription", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...form, logoUrl }),
+      body: JSON.stringify({ ...form, resterConnecte: true }),
     });
     const data = (await res.json()) as { error?: string; slug?: string };
     setSaving(false);
@@ -62,123 +41,111 @@ export default function CreerComptePage() {
       return;
     }
     if (data.slug) localStorage.setItem("sanitrace_identifiant", data.slug);
-    router.replace("/backoffice");
+    router.replace("/accueil");
     router.refresh();
   }
 
+  const mdpKo = Boolean(form.motDePasse && form.motDePasse2 && form.motDePasse !== form.motDePasse2);
+
   return (
-    <main className="mx-auto min-h-dvh max-w-2xl px-6 py-10">
+    <main className="mx-auto min-h-dvh w-full max-w-2xl px-6 py-8">
       <BackArrow />
       <p className="mt-6 text-xs font-semibold uppercase tracking-[0.22em] text-teal-700">Sanitrace</p>
-      <h1 className="mt-3 font-serif text-3xl font-semibold text-slate-900">Créer le compte établissement</h1>
+      <h1 className="mt-3 font-serif text-3xl font-semibold text-slate-900">Créer un compte</h1>
       <p className="mt-2 text-sm text-slate-500">
-        Un espace isolé pour ton restaurant : employés, équipements et dossier hygiène.
-        Tu pourras ensuite te reconnecter avec e-mail et mot de passe.
+        Un établissement, un espace isolé. Le même e-mail et mot de passe permettent d’en ajouter
+        d’autres ensuite.
       </p>
 
-      <form className="mt-8 space-y-4" onSubmit={(e) => void creer(e)}>
-        <Field label="Nom de l’établissement">
-          <Input
-            required
-            value={form.nomEtablissement}
-            onChange={(e) => setForm({ ...form, nomEtablissement: e.target.value })}
-          />
-        </Field>
-        <Field label="Adresse">
-          <Input value={form.adresse} onChange={(e) => setForm({ ...form, adresse: e.target.value })} />
-        </Field>
-        <div className="grid gap-3 sm:grid-cols-2">
-          <Field label="E-mail professionnel">
+      <form className="mt-8 space-y-8" onSubmit={(e) => void creer(e)}>
+        <fieldset className="space-y-4">
+          <legend className="font-serif text-xl font-semibold text-slate-900">L’établissement</legend>
+          <Field label="Nom de l’établissement">
+            <Input
+              required
+              value={form.nomEtablissement}
+              onChange={(e) => setForm({ ...form, nomEtablissement: e.target.value })}
+            />
+          </Field>
+          <Field label="SIREN ou SIRET">
+            <Input
+              required
+              inputMode="numeric"
+              value={form.siren}
+              onChange={(e) => setForm({ ...form, siren: e.target.value.replace(/\D/g, "").slice(0, 14) })}
+            />
+          </Field>
+          <Field label="Adresse du restaurant">
+            <Input
+              required
+              value={form.adresse}
+              onChange={(e) => setForm({ ...form, adresse: e.target.value })}
+            />
+          </Field>
+          <Field label="Adresse e-mail">
             <Input
               type="email"
               required
+              autoComplete="email"
               value={form.email}
               onChange={(e) => setForm({ ...form, email: e.target.value })}
             />
           </Field>
-          <Field label="Téléphone">
-            <Input value={form.telephone} onChange={(e) => setForm({ ...form, telephone: e.target.value })} />
+          <div className="grid gap-3 sm:grid-cols-2">
+            <Field label="Mot de passe (8 caractères min.)">
+              <Input
+                type="password"
+                required
+                minLength={8}
+                autoComplete="new-password"
+                value={form.motDePasse}
+                onChange={(e) => setForm({ ...form, motDePasse: e.target.value })}
+              />
+            </Field>
+            <Field label="Confirmer le mot de passe">
+              <Input
+                type="password"
+                required
+                minLength={8}
+                autoComplete="new-password"
+                value={form.motDePasse2}
+                onChange={(e) => setForm({ ...form, motDePasse2: e.target.value })}
+              />
+            </Field>
+          </div>
+        </fieldset>
+
+        <fieldset className="space-y-4">
+          <legend className="font-serif text-xl font-semibold text-slate-900">La personne qui crée le compte</legend>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <Field label="Nom">
+              <Input required value={form.nom} onChange={(e) => setForm({ ...form, nom: e.target.value })} />
+            </Field>
+            <Field label="Prénom">
+              <Input required value={form.prenom} onChange={(e) => setForm({ ...form, prenom: e.target.value })} />
+            </Field>
+          </div>
+          <Field label="Fonction dans l’établissement">
+            <select
+              className="h-12 w-full rounded-2xl border border-slate-200 px-3"
+              value={form.fonction}
+              onChange={(e) => setForm({ ...form, fonction: e.target.value })}
+            >
+              {FONCTIONS_ETABLISSEMENT.map((f) => (
+                <option key={f.value} value={f.value}>
+                  {f.label}
+                </option>
+              ))}
+            </select>
           </Field>
-        </div>
-        <Field label="Type de cuisine">
-          <select
-            className="h-12 w-full rounded-2xl border border-slate-200 px-3"
-            value={form.typeCuisine}
-            onChange={(e) => setForm({ ...form, typeCuisine: e.target.value })}
-          >
-            <option value="restauration_commerciale">Restauration commerciale</option>
-            <option value="brasserie">Brasserie</option>
-            <option value="traiteur">Traiteur</option>
-            <option value="collectivite">Collectivité</option>
-          </select>
-        </Field>
-        <label className="block space-y-2">
-          <Label>Logo</Label>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file) void onLogo(file);
-            }}
-          />
-          {logoUrl ? (
-            // Logo compressé en data URL pour le compte établissement.
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={logoUrl} alt="Logo établissement" className="h-20 w-20 rounded-2xl object-cover" />
-          ) : null}
-        </label>
-        <div className="grid gap-3 sm:grid-cols-2">
-          <Field label="Prénom du gérant">
-            <Input required value={form.prenom} onChange={(e) => setForm({ ...form, prenom: e.target.value })} />
-          </Field>
-          <Field label="Nom du gérant">
-            <Input required value={form.nom} onChange={(e) => setForm({ ...form, nom: e.target.value })} />
-          </Field>
-        </div>
-        <Field label="Code administrateur (4 chiffres)">
-          <Input
-            inputMode="numeric"
-            required
-            value={form.code}
-            onChange={(e) => setForm({ ...form, code: e.target.value.replace(/\D/g, "").slice(0, 4) })}
-          />
-        </Field>
-        <div className="grid gap-3 sm:grid-cols-2">
-          <Field label="Mot de passe (8 caractères min.)">
-            <Input
-              type="password"
-              required
-              minLength={8}
-              autoComplete="new-password"
-              value={form.motDePasse}
-              onChange={(e) => setForm({ ...form, motDePasse: e.target.value })}
-            />
-          </Field>
-          <Field label="Confirmer le mot de passe">
-            <Input
-              type="password"
-              required
-              minLength={8}
-              autoComplete="new-password"
-              value={form.motDePasse2}
-              onChange={(e) => setForm({ ...form, motDePasse2: e.target.value })}
-            />
-          </Field>
-        </div>
-        {form.motDePasse && form.motDePasse2 && form.motDePasse !== form.motDePasse2 ? (
-          <p className="text-sm text-red-600">Les mots de passe ne correspondent pas.</p>
-        ) : null}
+        </fieldset>
+
+        {mdpKo ? <p className="text-sm text-red-600">Les mots de passe ne correspondent pas.</p> : null}
         {error ? <p className="text-sm text-red-600">{error}</p> : null}
         <Button
           className="w-full"
           size="lg"
-          disabled={
-            saving ||
-            form.code.length !== 4 ||
-            form.motDePasse.length < 8 ||
-            form.motDePasse !== form.motDePasse2
-          }
+          disabled={saving || form.motDePasse.length < 8 || mdpKo}
         >
           {saving ? "Création…" : "Créer le compte"}
         </Button>

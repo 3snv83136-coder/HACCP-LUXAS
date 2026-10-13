@@ -11,7 +11,7 @@ export async function resolveEtablissement(etablissementId?: string | null) {
 
 export async function etablissementDeLaSession(request: Request, explicitId?: string | null) {
   const session = await sessionDepuisRequete(request);
-  if (!session) return resolveEtablissement(explicitId);
+  if (!session) return null;
   if (explicitId && session) {
     const found = await prisma.etablissement.findUnique({ where: { id: explicitId } });
     if (found && found.organisationId) {

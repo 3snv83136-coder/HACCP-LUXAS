@@ -1,5 +1,10 @@
-import { redirect } from "next/navigation";
+import { Suspense } from "react";
+import { ConnexionForm } from "./connexion-form";
 
-export default function ConnexionPage() {
-  redirect("/");
+export default function PageConnexion() {
+  return (
+    <Suspense fallback={<p className="p-10 text-center text-slate-500">Chargement…</p>}>
+      <ConnexionForm />
+    </Suspense>
+  );
 }

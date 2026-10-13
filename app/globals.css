@@ -33,6 +33,16 @@ body {
 }
 
 @media print {
+  @page {
+    size: 58mm 40mm;
+    margin: 0;
+  }
+  html,
+  body {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: white !important;
+  }
   .etiquette-print-root {
     background: white !important;
   }
@@ -42,6 +52,9 @@ body {
   .etiquette-ticket {
     box-shadow: none !important;
     border: 1px solid #111 !important;
+    position: absolute;
+    left: 0;
+    top: 0;
   }
 }
 

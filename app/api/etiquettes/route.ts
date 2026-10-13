@@ -32,8 +32,8 @@ export async function POST(request: Request) {
   };
   const produit = (body.produit ?? "").trim();
   const photoUrl = body.photoUrl ?? "";
-  if (!produit || !photoUrl) {
-    return NextResponse.json({ error: "Produit et photo requis" }, { status: 400 });
+  if (!produit) {
+    return NextResponse.json({ error: "Produit requis" }, { status: 400 });
   }
   if (photoUrl.length > 1_200_000) {
     return NextResponse.json({ error: "Photo trop lourde" }, { status: 400 });
@@ -52,7 +52,7 @@ export async function POST(request: Request) {
   });
 
   let impressionId: string | null = null;
-  if (body.imprimer !== false) {
+  if (body.imprimer) {
     const job = await prisma.impression.create({
       data: {
         etablissementId: etab.id,

@@ -1,23 +1,26 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { PhotoCapture } from "@/components/terrain/photo-capture";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { EtiquetteApercu } from "@/components/etiquettes/etiquette-apercu";
+import { codeEtiquette } from "@/lib/etiquette-code";
 import Link from "next/link";
 
 type Capture = {
   id: string;
   produit: string;
   lot: string | null;
-  dlc: string | null;
   type: string;
   photoUrl: string;
   createdAt: string;
 };
 
 export default function TracabilitePage() {
+  const router = useRouter();
   const [photo, setPhoto] = useState<string | null>(null);
   const [produit, setProduit] = useState("");
   const [lot, setLot] = useState("");
@@ -36,16 +39,20 @@ export default function TracabilitePage() {
   }, []);
 
   async function enregistrer(imprimer: boolean) {
-    if (!photo || !produit) return;
-    await fetch("/api/etiquettes", {
+    if (!produit) return;
+    const res = await fetch("/api/etiquettes", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ produit, lot, type, photoUrl: photo, imprimer }),
+      body: JSON.stringify({ produit, lot, type, photoUrl: photo ?? "", imprimer }),
     });
+    const data = (await res.json()) as { impressionId?: string | null };
     setProduit("");
     setLot("");
     setPhoto(null);
     await load();
+    if (imprimer && data.impressionId) {
+      router.push(`/station-impression?auto=${data.impressionId}`);
+    }
   }
 
   function imprimer(item: Capture) {
@@ -57,10 +64,9 @@ export default function TracabilitePage() {
     <div className="etiquette-print-root space-y-6">
       <div className="no-print">
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-teal-700">Traçabilité</p>
-        <h1 className="mt-1 font-serif text-3xl font-semibold">Photo → étiquette</h1>
+        <h1 className="mt-1 font-serif text-3xl font-semibold">Créer une étiquette</h1>
         <p className="mt-1 max-w-2xl text-slate-500">
-          Photographie l’étiquette d’origine. Enregistre-la au dossier, puis envoie-la à l’imprimante
-          seulement si besoin.
+          Aperçu 58×40 mm avant impression. Code-barres + infos saisies. La photo n’est pas imprimée.
         </p>
       </div>
 
@@ -71,7 +77,7 @@ export default function TracabilitePage() {
           void enregistrer(false);
         }}
       >
-        <PhotoCapture value={photo} onChange={setPhoto} label="Photo de l’étiquette" />
+        <PhotoCapture value={photo} onChange={setPhoto} label="Photo (optionnelle, non imprimée)" />
         <div className="grid gap-3 sm:grid-cols-2">
           <label className="space-y-1.5">
             <Label>Produit</Label>
@@ -95,15 +101,21 @@ export default function TracabilitePage() {
             <Input value={lot} onChange={(e) => setLot(e.target.value)} />
           </label>
         </div>
+        {produit ? (
+          <div className="no-print">
+            <EtiquetteApercu
+              produit={produit}
+              lot={lot || null}
+              type={type}
+              createdAt={new Date().toISOString()}
+              code={codeEtiquette("APERCU", lot)}
+            />
+          </div>
+        ) : null}
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-          <Button disabled={!photo || !produit}>Enregistrer</Button>
-          <Button
-            type="button"
-            variant="outline"
-            disabled={!photo || !produit}
-            onClick={() => void enregistrer(true)}
-          >
-            Envoyer à l’imprimante
+          <Button disabled={!produit}>Enregistrer</Button>
+          <Button type="button" variant="outline" disabled={!produit} onClick={() => void enregistrer(true)}>
+            Connecter l’imprimante et imprimer
           </Button>
           <Link href="/station-impression" className="inline-flex h-11 items-center text-sm text-teal-800">
             Ouvrir la station d’impression →
@@ -115,16 +127,27 @@ export default function TracabilitePage() {
         <h2 className="font-serif text-lg font-semibold">Dernières captures</h2>
         {items.map((item) => (
           <article key={item.id} className="flex flex-col gap-3 rounded-3xl border border-slate-200 bg-white p-4 sm:flex-row">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={item.photoUrl} alt={item.produit} className="h-28 w-full rounded-2xl object-cover sm:w-40" />
+            {item.photoUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={item.photoUrl} alt={item.produit} className="h-28 w-full rounded-2xl object-cover sm:w-40" />
+            ) : null}
             <div className="min-w-0 flex-1">
               <p className="font-semibold">{item.produit}</p>
               <p className="text-sm text-slate-500">
                 {item.type}
                 {item.lot ? ` · lot ${item.lot}` : ""}
               </p>
+              <div className="mt-3 no-print">
+                <EtiquetteApercu
+                  produit={item.produit}
+                  lot={item.lot}
+                  type={item.type}
+                  createdAt={item.createdAt}
+                  code={codeEtiquette(item.id, item.lot)}
+                />
+              </div>
               <Button variant="outline" className="mt-3" onClick={() => imprimer(item)}>
-                Imprimer 58×40 mm
+                Imprimer
               </Button>
             </div>
           </article>
@@ -132,12 +155,15 @@ export default function TracabilitePage() {
       </section>
 
       {printItem ? (
-        <div className="etiquette-ticket mx-auto hidden h-[40mm] w-[58mm] overflow-hidden rounded-sm border border-slate-900 bg-white p-1 print:block">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={printItem.photoUrl} alt="" className="h-12 w-full object-cover" />
-          <p className="mt-1 text-[10px] font-bold leading-tight">{printItem.produit}</p>
-          <p className="text-[8px] uppercase">{printItem.type}</p>
-          <p className="font-mono text-[8px]">{printItem.lot ? `Lot ${printItem.lot}` : ""}</p>
+        <div className="hidden justify-center print:flex">
+          <EtiquetteApercu
+            produit={printItem.produit}
+            lot={printItem.lot}
+            type={printItem.type}
+            createdAt={printItem.createdAt}
+            code={codeEtiquette(printItem.id, printItem.lot)}
+            className="print:block"
+          />
         </div>
       ) : null}
     </div>

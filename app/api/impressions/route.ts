@@ -9,6 +9,13 @@ export async function GET(request: Request) {
   const etab = await etablissementDeLaSession(request);
   if (!etab) return NextResponse.json({ items: [] });
   const { searchParams } = new URL(request.url);
+  const id = searchParams.get("id");
+  if (id) {
+    const item = await prisma.impression.findFirst({
+      where: { id, etablissementId: etab.id },
+    });
+    return NextResponse.json({ item, etablissement: { nom: etab.nom } });
+  }
   const statut = searchParams.get("statut") ?? undefined;
   const items = await prisma.impression.findMany({
     where: { etablissementId: etab.id, ...(statut ? { statut } : {}) },

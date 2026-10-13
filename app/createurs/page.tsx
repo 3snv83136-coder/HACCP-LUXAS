@@ -44,7 +44,7 @@ export default function CreateursDashboardPage() {
   const charger = useCallback(async () => {
     const res = await fetch("/api/createurs/etablissements");
     if (res.status === 401) {
-      router.replace("/");
+      router.replace("/createurs/connexion");
       return;
     }
     if (!res.ok) {

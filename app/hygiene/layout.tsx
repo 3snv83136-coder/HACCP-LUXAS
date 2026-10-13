@@ -11,14 +11,12 @@ export default function HygieneLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
   const compte = useEtablissementCourant();
 
-  async function quit() {
-    await fetch("/api/auth/logout", { method: "POST" });
-    router.replace("/");
-    router.refresh();
+  function quit() {
+    router.replace("/accueil");
   }
 
   return (
-    <div className="min-h-dvh bg-slate-50 text-slate-900">
+    <div className="min-h-dvh w-full overflow-x-hidden bg-slate-50 text-slate-900">
       <header className="sticky top-0 z-20 flex items-center justify-between border-b border-slate-200 bg-white/95 px-4 py-3 backdrop-blur">
         <div className="flex min-w-0 items-center gap-3">
           <BackArrow />
@@ -32,7 +30,7 @@ export default function HygieneLayout({ children }: { children: ReactNode }) {
           <Link href="/station-impression" className="text-slate-500">
             Imprimante
           </Link>
-          <button type="button" onClick={() => void quit()} className="text-slate-500">
+          <button type="button" onClick={quit} className="text-slate-500">
             Quitter
           </button>
         </div>

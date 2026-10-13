@@ -9,6 +9,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { useRouter } from "next/navigation";
 import {
   clearSession,
   listQueue,
@@ -63,6 +64,7 @@ function mergeReleves(server: ReleveLocal[], local: ReleveLocal[]): ReleveLocal[
 }
 
 export function TerrainProvider({ children }: { children: ReactNode }) {
+  const router = useRouter();
   const [session, setSession] = useState<SessionOperateur | null>(null);
   const [bootstrap, setBootstrap] = useState<BootstrapPayload | null>(null);
   const [releves, setReleves] = useState<ReleveLocal[]>([]);
@@ -164,12 +166,12 @@ export function TerrainProvider({ children }: { children: ReactNode }) {
   }, [hydrate, session]);
 
   const signOut = useCallback(async () => {
-    await fetch("/api/auth/logout", { method: "POST" });
     await clearSession();
     setSession(null);
     setBootstrap(null);
     setReleves([]);
-  }, []);
+    router.replace("/accueil");
+  }, [router]);
 
   const taches = useMemo(() => {
     if (!bootstrap) return [];
@@ -239,7 +241,7 @@ export function TerrainProvider({ children }: { children: ReactNode }) {
 
   return (
     <TerrainContext.Provider value={value}>
-      <div className="mx-auto flex min-h-dvh max-w-lg flex-col">
+      <div className="mx-auto flex min-h-dvh w-full max-w-lg flex-col md:max-w-2xl lg:max-w-4xl">
         <header className="sticky top-0 z-20 flex items-center justify-between gap-3 border-b border-slate-200 bg-white/90 px-4 py-3 backdrop-blur">
           <div className="flex min-w-0 items-center gap-3">
             <BackArrow />

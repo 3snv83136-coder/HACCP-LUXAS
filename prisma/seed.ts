@@ -105,6 +105,7 @@ async function main() {
       nom: "Luxas",
       prenom: "Gérant",
       email: "gerant@luxas.local",
+      motDePasseHash: await bcrypt.hash("Sanitrace1", 10),
     },
   });
 

@@ -73,10 +73,8 @@ export function BackofficeShell({ children }: { children: ReactNode }) {
     return <>{children}</>;
   }
 
-  async function logout() {
-    await fetch("/api/auth/logout", { method: "POST" });
-    router.replace("/");
-    router.refresh();
+  function logout() {
+    router.replace("/accueil");
   }
 
   return (
