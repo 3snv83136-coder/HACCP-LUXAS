@@ -79,7 +79,7 @@ function FormInner({ titre, sousTitre, destination, mode }: Props) {
           value={identifiant}
           onChange={(e) => setIdentifiant(e.target.value)}
           className="mt-2"
-          placeholder="ex. le-zinc-ab12 ou cuisine@resto.fr"
+          placeholder="ex. cuisine@resto.fr"
         />
       </label>
       <label className="mt-4 block text-sm font-medium text-slate-700">

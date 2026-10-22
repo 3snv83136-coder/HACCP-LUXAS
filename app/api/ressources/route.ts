@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { etablissementDeLaSession } from "@/lib/server/etab";
+import { PARAM_KEYS, SEED_PARAMETRES } from "@/lib/params";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -46,13 +47,27 @@ export async function POST(request: Request) {
   if (!nom) return NextResponse.json({ error: "Nom requis" }, { status: 400 });
 
   if (body.kind === "frigo") {
+    const type = body.type === "froid_negatif" ? "froid_negatif" : "froid_positif";
+    const params = await prisma.parametre.findMany({ where: { organisationId: etab.organisationId } });
+    const map = Object.fromEntries(params.map((p) => [p.cle, p.valeur]));
+    const seuilPositif = Number(map[PARAM_KEYS.TEMP_FROID_POSITIF] ?? SEED_PARAMETRES.TEMP_FROID_POSITIF);
+    const seuilNegatif = Number(map[PARAM_KEYS.TEMP_CONGELATION] ?? SEED_PARAMETRES.TEMP_CONGELATION);
     const item = await prisma.equipement.create({
       data: {
         etablissementId: etab.id,
         nom,
-        type: body.type?.trim() || "froid_positif",
+        type,
         qrToken: `eq-${Date.now().toString(36)}`,
-        seuilMax: body.seuilMax ?? 4,
+        seuilMax: type === "froid_negatif" ? seuilNegatif : (body.seuilMax ?? seuilPositif),
+      },
+    });
+    await prisma.planFrequence.create({
+      data: {
+        etablissementId: etab.id,
+        cibleType: "equipement",
+        cibleId: item.id,
+        frequence: "2x_jour",
+        horaires: `${map[PARAM_KEYS.RELEVE_MATIN_LIMITE] ?? "11:00"},${map[PARAM_KEYS.RELEVE_SOIR_LIMITE] ?? "18:00"}`,
       },
     });
     return NextResponse.json({ ok: true, item });
@@ -121,6 +136,13 @@ export async function DELETE(request: Request) {
   if (kind === "frigo") {
     await prisma.equipement.updateMany({
       where: { id, etablissementId: etab.id },
+      data: {
+        actif: false,
+        qrToken: `supprime-${id.slice(-8)}-${Date.now().toString(36)}`,
+      },
+    });
+    await prisma.planFrequence.updateMany({
+      where: { etablissementId: etab.id, cibleType: "equipement", cibleId: id },
       data: { actif: false },
     });
   } else if (kind === "friteuse") {

@@ -168,9 +168,9 @@ export function TerrainProvider({ children }: { children: ReactNode }) {
   }, [router]);
 
   const taches = useMemo(() => {
-    if (!bootstrap) return [];
-    return buildTachesDuJour(bootstrap, releves);
-  }, [bootstrap, releves]);
+    if (!bootstrap || !session) return [];
+    return buildTachesDuJour(bootstrap, releves, new Date(), session.codeOperateurId);
+  }, [bootstrap, releves, session]);
 
   if (loading) {
     return (

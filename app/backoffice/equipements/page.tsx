@@ -34,7 +34,12 @@ export default function EquipementsPage() {
             <img src={eq.qrDataUrl} alt={`QR ${eq.nom}`} className="mx-auto h-44 w-44" />
             <h2 className="mt-3 text-lg font-semibold">{eq.nom}</h2>
             <p className="text-sm text-slate-500">
-              {eq.type.replaceAll("_", " ")} · max {eq.seuilMax ?? "—"} °C
+              {eq.type === "froid_negatif"
+                ? "Frigo négatif"
+                : eq.type === "froid_positif"
+                  ? "Frigo positif"
+                  : eq.type.replaceAll("_", " ")}{" "}
+              · max {eq.seuilMax ?? "—"} °C
             </p>
             <p className="mt-1 font-mono text-xs text-slate-400">{eq.qrToken}</p>
           </article>

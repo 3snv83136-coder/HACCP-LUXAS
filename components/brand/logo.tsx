@@ -9,19 +9,26 @@ type BrandLogoProps = {
   alt?: string;
 };
 
+function logoAutorise(src?: string | null) {
+  if (!src) return null;
+  if (src.includes("logo-le-zinc-bouillon")) return null;
+  return src;
+}
+
 export function BrandLogo({ size = 64, className, priority = false, src, alt }: BrandLogoProps) {
   const classes = cn("rounded-2xl object-cover shadow-sm", className);
-  if (src) {
-    if (src.startsWith("data:") || src.startsWith("blob:")) {
+  const image = logoAutorise(src);
+  if (image) {
+    if (image.startsWith("data:") || image.startsWith("blob:")) {
       return (
         // Logo établissement stocké en data URL (inscription).
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={src} alt={alt ?? "Logo de l’établissement"} width={size} height={size} className={classes} />
+        <img src={image} alt={alt ?? "Logo de l’établissement"} width={size} height={size} className={classes} />
       );
     }
     return (
       <Image
-        src={src}
+        src={image}
         alt={alt ?? "Logo de l’établissement"}
         width={size}
         height={size}

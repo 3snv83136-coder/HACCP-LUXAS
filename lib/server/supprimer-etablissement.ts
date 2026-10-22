@@ -12,6 +12,8 @@ export async function supprimerEtablissement(id: string) {
 
   await prisma.$transaction(
     async (tx) => {
+      await tx.messagePiece.deleteMany({ where: { message: { etablissementId: id } } });
+      await tx.message.deleteMany({ where: { etablissementId: id } });
       await tx.impression.deleteMany({ where: { etablissementId: id } });
       await tx.captureEtiquette.deleteMany({ where: { etablissementId: id } });
       await tx.alerte.deleteMany({ where: { etablissementId: id } });

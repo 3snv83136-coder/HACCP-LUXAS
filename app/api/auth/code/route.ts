@@ -5,6 +5,7 @@ import { SESSION_COOKIE } from "@/lib/auth/session";
 import { sessionDepuisRequete } from "@/lib/server/session-request";
 import { payloadDepuisMembre, tokenSession, vueDepuisPayload } from "@/lib/server/auth-resto";
 import { trouverEtablissement } from "@/lib/server/etab";
+import { assurerCodesDemo } from "@/lib/server/assurer-codes-demo";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -14,6 +15,7 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  await assurerCodesDemo();
   const body = (await request.json()) as { code?: string; identifiant?: string };
   const code = (body.code ?? "").replace(/\D/g, "").slice(0, 4);
   if (!/^\d{4}$/.test(code)) {

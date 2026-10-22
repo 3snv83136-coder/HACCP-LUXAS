@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { CREATEUR_COOKIE, readCreateur, signCreateur } from "@/lib/auth/createur";
 import { optionsCookieAuth } from "@/lib/auth/cookie";
 import { verifierAccesDashboard } from "@/lib/server/createur-acces";
+import { assurerCodesDemo } from "@/lib/server/assurer-codes-demo";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -25,6 +26,7 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   const body = (await request.json()) as { email?: string; code?: string; motDePasse?: string };
+  await assurerCodesDemo();
   const compte = await verifierAccesDashboard(body.email ?? "", body.code ?? body.motDePasse ?? "");
   if (!compte) {
     return NextResponse.json({ error: "E-mail ou code incorrect" }, { status: 401 });

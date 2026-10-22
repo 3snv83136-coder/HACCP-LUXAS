@@ -1,8 +1,11 @@
 import { prisma } from "@/lib/db";
 import type { BootstrapPayload, ReleveLocal } from "@/lib/types";
 import { resolveEtablissement } from "@/lib/server/etab";
+import { retirerLogoZincBouillon } from "@/lib/server/auth-resto";
+import { assurerParamsJoursReleve } from "@/lib/server/params-assurer";
 
 export async function getBootstrap(etablissementId?: string): Promise<BootstrapPayload> {
+  await retirerLogoZincBouillon();
   const etab = await resolveEtablissement(etablissementId);
   if (!etab) {
     throw new Error("Aucun établissement. Lance `npx prisma db seed`.");
@@ -81,6 +84,7 @@ export async function getBootstrap(etablissementId?: string): Promise<BootstrapP
   const planByCible = new Map(plans.map((p) => [`${p.cibleType}:${p.cibleId}`, p]));
   const params: Record<string, string> = {};
   for (const p of paramsRows) params[p.cle] = p.valeur;
+  await assurerParamsJoursReleve(etab.organisationId, params);
 
   const relevesRecents: ReleveLocal[] = releves.map((r) => ({
     id: r.id,
@@ -100,7 +104,12 @@ export async function getBootstrap(etablissementId?: string): Promise<BootstrapP
 
   return {
     organisationId: etab.organisationId,
-    etablissement: { id: etab.id, nom: etab.nom, adresse: etab.adresse, logoUrl: etab.logoUrl },
+    etablissement: {
+      id: etab.id,
+      nom: etab.nom,
+      adresse: etab.adresse,
+      logoUrl: etab.logoUrl?.includes("logo-le-zinc-bouillon") ? null : etab.logoUrl,
+    },
     params,
     equipements: equipements.map((e) => {
       const plan = planByCible.get(`equipement:${e.id}`);

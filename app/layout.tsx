@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     "Relevés, traçabilité, plan de nettoyage et dossier DDPP pour chaque établissement.",
   applicationName: "Sanitrace",
   manifest: "/manifest.json",
-  icons: { icon: "/logo-le-zinc-bouillon.png", apple: "/logo-le-zinc-bouillon.png" },
+  icons: { icon: "/icon.svg", apple: "/icon.svg" },
   appleWebApp: {
     capable: true,
     title: "Sanitrace",

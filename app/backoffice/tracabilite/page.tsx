@@ -60,6 +60,12 @@ export default function TracabilitePage() {
     window.setTimeout(() => window.print(), 150);
   }
 
+  async function supprimer(item: Capture) {
+    if (!window.confirm(`Supprimer l’étiquette « ${item.produit} » ?`)) return;
+    await fetch(`/api/etiquettes?id=${encodeURIComponent(item.id)}`, { method: "DELETE" });
+    await load();
+  }
+
   return (
     <div className="etiquette-print-root space-y-6">
       <div className="no-print">
@@ -146,9 +152,14 @@ export default function TracabilitePage() {
                   code={codeEtiquette(item.id, item.lot)}
                 />
               </div>
-              <Button variant="outline" className="mt-3" onClick={() => imprimer(item)}>
-                Imprimer
-              </Button>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <Button variant="outline" onClick={() => imprimer(item)}>
+                  Imprimer
+                </Button>
+                <Button variant="ghost" onClick={() => void supprimer(item)}>
+                  Supprimer
+                </Button>
+              </div>
             </div>
           </article>
         ))}

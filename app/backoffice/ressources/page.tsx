@@ -14,6 +14,7 @@ export default function RessourcesPage() {
   const [slug, setSlug] = useState<string | null>(null);
   const [nom, setNom] = useState("");
   const [kind, setKind] = useState<"frigo" | "friteuse" | "surface">("frigo");
+  const [typeFroid, setTypeFroid] = useState<"froid_positif" | "froid_negatif">("froid_positif");
 
   async function load() {
     const res = await fetch("/api/ressources");
@@ -37,7 +38,7 @@ export default function RessourcesPage() {
     await fetch("/api/ressources", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ kind, nom }),
+      body: JSON.stringify({ kind, nom, type: kind === "frigo" ? typeFroid : undefined }),
     });
     setNom("");
     await load();
@@ -87,6 +88,19 @@ export default function RessourcesPage() {
             <option value="surface">Surface de nettoyage</option>
           </select>
         </label>
+        {kind === "frigo" ? (
+          <label className="flex-1 text-sm">
+            Température
+            <select
+              className="mt-1 h-11 w-full rounded-2xl border border-slate-200 px-3"
+              value={typeFroid}
+              onChange={(e) => setTypeFroid(e.target.value as typeof typeFroid)}
+            >
+              <option value="froid_positif">Frigo positif (frais)</option>
+              <option value="froid_negatif">Frigo négatif (congélation)</option>
+            </select>
+          </label>
+        ) : null}
         <label className="flex-[2] text-sm">
           Nom
           <Input className="mt-1" required value={nom} onChange={(e) => setNom(e.target.value)} />
@@ -94,7 +108,16 @@ export default function RessourcesPage() {
         <Button>Ajouter</Button>
       </form>
 
-      <Bloc titre="Frigos & enceintes" items={frigos} kind="frigo" label={(i) => i.nom ?? ""} onDel={supprimer} onEdit={modifier} />
+      <Bloc
+        titre="Frigos & enceintes"
+        items={frigos}
+        kind="frigo"
+        label={(i) =>
+          `${i.nom ?? ""}${i.type === "froid_negatif" ? " · négatif" : i.type === "froid_positif" ? " · positif" : ""}`
+        }
+        onDel={supprimer}
+        onEdit={modifier}
+      />
       <Bloc
         titre="Friteuses"
         items={friteuses}

@@ -46,7 +46,7 @@ export async function sessionOperateurLibre(): Promise<SessionOperateur | null> 
   return {
     etablissementId: session.etablissementId,
     etablissementNom: etab?.nom ?? "",
-    logoUrl: etab?.logoUrl ?? null,
+    logoUrl: etab?.logoUrl?.includes("logo-le-zinc-bouillon") ? null : etab?.logoUrl ?? null,
     organisationId: etab?.organisationId ?? "",
     membreId: session.membreId,
     utilisateurId: session.utilisateurId,

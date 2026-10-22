@@ -1,7 +1,7 @@
 export function genererCodeBarres() {
   const t = Date.now().toString(36).toUpperCase().replace(/[^A-Z0-9]/g, "");
   const r = Math.random().toString(36).toUpperCase().replace(/[^A-Z0-9]/g, "").slice(2, 6);
-  return `ST${t}${r}`.slice(0, 12);
+  return `ST${t}${r}`.slice(0, 8);
 }
 
 export function codeEtiquette(id: string, lot?: string | null) {

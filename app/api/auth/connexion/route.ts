@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { verifyCode } from "@/lib/crypto";
 import { SESSION_COOKIE } from "@/lib/auth/session";
 import { assurerCompteRestoDemo, heuresSession, payloadDepuisMembre, tokenSession } from "@/lib/server/auth-resto";
+import { assurerCodesDemo } from "@/lib/server/assurer-codes-demo";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -19,6 +20,7 @@ export async function POST(request: Request) {
     etablissementId?: string;
   };
   await assurerCompteRestoDemo();
+  await assurerCodesDemo();
   const email = (body.email ?? "").trim().toLowerCase();
   const motDePasse = body.motDePasse ?? "";
   if (!email || !motDePasse) {

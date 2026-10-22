@@ -14,15 +14,22 @@ export function heuresSession(resterConnecte: boolean) {
   return resterConnecte ? 24 * 30 : 12;
 }
 
+export async function retirerLogoZincBouillon() {
+  await prisma.etablissement.updateMany({
+    where: { logoUrl: { contains: "logo-le-zinc-bouillon" } },
+    data: { logoUrl: null },
+  });
+}
+
 export async function assurerCompteRestoDemo() {
+  await retirerLogoZincBouillon();
   const gerant = await prisma.utilisateur.findFirst({
     where: { email: { equals: EMAIL_RESTO_DEMO, mode: "insensitive" } },
   });
   if (!gerant) return;
-  if (gerant.motDePasseHash) return;
   await prisma.utilisateur.update({
     where: { id: gerant.id },
-    data: { motDePasseHash: await hashCode(MDP_RESTO_DEMO) },
+    data: { motDePasseHash: await hashCode(MDP_RESTO_DEMO), actif: true },
   });
 }
 
@@ -63,7 +70,7 @@ export async function vueDepuisPayload(session: SessionPayload): Promise<Session
   return {
     etablissementId: etab.id,
     etablissementNom: etab.nom,
-    logoUrl: etab.logoUrl,
+    logoUrl: etab.logoUrl?.includes("logo-le-zinc-bouillon") ? null : etab.logoUrl,
     organisationId: etab.organisationId,
     membreId: session.membreId,
     utilisateurId: session.utilisateurId,

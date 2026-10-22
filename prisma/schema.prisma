@@ -30,11 +30,12 @@ model Etablissement {
   adresse        String?
   email          String?
   telephone      String?
-  logoUrl        String?  @map("logo_url")
-  slug           String?  @unique
-  typeCuisine    String   @map("type_cuisine")
-  actif          Boolean  @default(true)
-  createdAt      DateTime @default(now()) @map("created_at")
+  logoUrl             String?  @map("logo_url")
+  slug                String?  @unique
+  typeCuisine         String   @map("type_cuisine")
+  codeBackofficeHash  String?  @map("code_backoffice_hash")
+  actif               Boolean  @default(true)
+  createdAt           DateTime @default(now()) @map("created_at")
 
   organisation         Organisation          @relation(fields: [organisationId], references: [id], onDelete: Restrict)
   membres              MembreEtablissement[]
@@ -57,6 +58,7 @@ model Etablissement {
   alertes              Alerte[]
   capturesEtiquette    CaptureEtiquette[]
   impressions          Impression[]
+  messages             Message[]
 
   @@index([organisationId])
   @@map("etablissement")
@@ -455,6 +457,8 @@ model DocumentPms {
   categorie       String
   version         String
   fichierUrl      String?  @map("fichier_url")
+  commentaire     String?
+  source          String   @default("pms")
   createdAt       DateTime @default(now()) @map("created_at")
 
   etablissement Etablissement @relation(fields: [etablissementId], references: [id], onDelete: Restrict)
@@ -545,6 +549,37 @@ model Impression {
 
   @@index([etablissementId, statut, createdAt])
   @@map("impression")
+  @@schema("haccp")
+}
+
+model Message {
+  id              String   @id @default(cuid())
+  canal           String
+  etablissementId String   @map("etablissement_id")
+  auteurType      String   @map("auteur_type")
+  auteurNom       String   @map("auteur_nom")
+  texte           String
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  etablissement Etablissement  @relation(fields: [etablissementId], references: [id], onDelete: Restrict)
+  pieces        MessagePiece[]
+
+  @@index([etablissementId, canal, createdAt])
+  @@map("message")
+  @@schema("haccp")
+}
+
+model MessagePiece {
+  id        String @id @default(cuid())
+  messageId String @map("message_id")
+  nom       String
+  mime      String
+  contenu   String
+
+  message Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  @@index([messageId])
+  @@map("message_piece")
   @@schema("haccp")
 }
 

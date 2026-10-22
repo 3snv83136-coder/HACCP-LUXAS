@@ -2,13 +2,27 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Camera, ClipboardList, Droplets, Flame, Images, Package, ScanBarcode, TriangleAlert, UtensilsCrossed } from "lucide-react";
+import {
+  Camera,
+  ClipboardCheck,
+  ClipboardList,
+  Droplets,
+  Flame,
+  Images,
+  Package,
+  Megaphone,
+  ScanBarcode,
+  TriangleAlert,
+  UtensilsCrossed,
+} from "lucide-react";
 import { TaskCard } from "@/components/terrain/task-card";
 import { useTerrain } from "@/components/terrain/terrain-provider";
 
 const shortcuts = [
   { href: "/terrain/scan", label: "Scan QR", icon: Camera },
   { href: "/terrain/scan-etiquette", label: "Scanner", icon: ScanBarcode },
+  { href: "/terrain/checklist", label: "Check-list", icon: ClipboardCheck },
+  { href: "/terrain/infos", label: "Infos", icon: Megaphone },
   { href: "/terrain/tracabilite", label: "Traçabilité", icon: Images },
   { href: "/terrain/reception", label: "Réception", icon: Package },
   { href: "/terrain/menage", label: "Ménage", icon: Droplets },

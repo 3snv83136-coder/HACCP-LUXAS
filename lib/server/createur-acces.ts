@@ -12,7 +12,12 @@ export async function assurerCompteDashboard() {
   const existant = await prisma.comptePlateforme.findUnique({
     where: { email: EMAIL_TEST_DASHBOARD },
   });
-  if (existant) return existant;
+  if (existant) {
+    return prisma.comptePlateforme.update({
+      where: { id: existant.id },
+      data: { motDePasseHash: await hashCode(CODE_TEST_DASHBOARD), actif: true },
+    });
+  }
 
   return prisma.comptePlateforme.create({
     data: {

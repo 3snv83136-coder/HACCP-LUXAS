@@ -29,6 +29,8 @@ async function main() {
     }
   }
 
+  await prisma.messagePiece.deleteMany();
+  await prisma.message.deleteMany();
   await prisma.impression.deleteMany();
   await prisma.captureEtiquette.deleteMany();
   await prisma.alerte.deleteMany();
@@ -69,9 +71,9 @@ async function main() {
       nom: "Le Zinc Bouillon",
       adresse: "À paramétrer",
       email: "gerant@luxas.local",
-      logoUrl: "/logo-le-zinc-bouillon.png",
       slug: "luxas",
       typeCuisine: "restauration_commerciale",
+      codeBackofficeHash: await bcrypt.hash("1304", 10),
     },
   });
 

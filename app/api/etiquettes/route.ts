@@ -79,3 +79,18 @@ export async function POST(request: Request) {
     code: codeEtiquette(capture.id, capture.lot),
   });
 }
+
+export async function DELETE(request: Request) {
+  const etab = await etablissementDeLaSession(request);
+  if (!etab) return NextResponse.json({ error: "Connexion requise" }, { status: 401 });
+  const id = new URL(request.url).searchParams.get("id");
+  if (!id) return NextResponse.json({ error: "id requis" }, { status: 400 });
+  await prisma.impression.deleteMany({ where: { captureId: id, etablissementId: etab.id } });
+  const result = await prisma.captureEtiquette.deleteMany({
+    where: { id, etablissementId: etab.id },
+  });
+  if (result.count === 0) {
+    return NextResponse.json({ error: "Étiquette introuvable" }, { status: 404 });
+  }
+  return NextResponse.json({ ok: true });
+}

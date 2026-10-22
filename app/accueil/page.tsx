@@ -11,13 +11,13 @@ const acces = [
   {
     href: "/terrain",
     label: "Accès Employé",
-    texte: "Relevés, ménage, réceptions et étiquettes.",
+    texte: "Relevés, check-lists, infos du gérant, ménage et étiquettes.",
     icon: ChefHat,
   },
   {
     href: "/backoffice",
     label: "Accès Administrateur",
-    texte: "Équipe, équipements, traçabilité et paramétrage.",
+    texte: "Équipe, messagerie, équipements, traçabilité et paramétrage.",
     icon: LayoutDashboard,
   },
   {

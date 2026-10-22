@@ -9,6 +9,7 @@ import {
   ClipboardCheck,
   FileText,
   GraduationCap,
+  MessageSquare,
   LayoutDashboard,
   Menu,
   Package,
@@ -25,9 +26,11 @@ import { cn } from "@/lib/utils";
 import { BackArrow } from "@/components/navigation/back-arrow";
 import { BrandLogo, SanitraceNom } from "@/components/brand/logo";
 import { useEtablissementCourant } from "@/components/brand/use-etablissement";
+import { BackofficePinGate } from "@/components/backoffice/pin-gate";
 
 const nav = [
   { href: "/backoffice", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/backoffice/messages", label: "Messagerie", icon: MessageSquare },
   { href: "/backoffice/hygiene", label: "Contrôle hygiène", icon: ClipboardCheck },
   { href: "/backoffice/produits", label: "Produits", icon: Package },
   { href: "/backoffice/personnel", label: "Salariés", icon: Users },
@@ -78,6 +81,7 @@ export function BackofficeShell({ children }: { children: ReactNode }) {
   }
 
   return (
+    <BackofficePinGate>
     <div className="min-h-dvh overflow-x-hidden bg-white text-slate-900">
       <div className="flex min-h-dvh">
         <aside className="hidden w-64 shrink-0 border-r border-slate-200 bg-white p-5 lg:block">
@@ -205,6 +209,7 @@ export function BackofficeShell({ children }: { children: ReactNode }) {
         </div>
       ) : null}
     </div>
+    </BackofficePinGate>
   );
 }
 

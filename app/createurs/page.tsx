@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Building2, Tags, Thermometer, Trash2, Users } from "lucide-react";
+import { Building2, FileUp, MessageSquare, Tags, Thermometer, Trash2, Users } from "lucide-react";
+import Link from "next/link";
 import { AccesDashboardForm } from "@/components/admin/acces-dashboard-form";
 import { BrandLogo } from "@/components/brand/logo";
 import { BackArrow } from "@/components/navigation/back-arrow";
@@ -184,6 +185,20 @@ export default function CreateursDashboardPage() {
                 {e.etiquettes}
               </p>
               <div className="flex flex-wrap items-center gap-2">
+                <Link
+                  href={`/createurs/documents/${e.id}`}
+                  className="inline-flex items-center gap-1 rounded-full bg-amber-300/15 px-3 py-1 text-xs font-semibold text-amber-200"
+                >
+                  <FileUp className="h-3.5 w-3.5" />
+                  Déposer un document
+                </Link>
+                <Link
+                  href={`/createurs/messages/${e.id}`}
+                  className="inline-flex items-center gap-1 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-zinc-200"
+                >
+                  <MessageSquare className="h-3.5 w-3.5" />
+                  Message
+                </Link>
                 <button
                   type="button"
                   onClick={() => void toggleActif(e)}

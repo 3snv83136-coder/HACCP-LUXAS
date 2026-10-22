@@ -11,7 +11,7 @@ export async function GET(request: Request) {
   if (!etab) return NextResponse.json({ equipements: [] });
 
   const equipements = await prisma.equipement.findMany({
-    where: { etablissementId: etab.id },
+    where: { etablissementId: etab.id, actif: true },
     orderBy: { nom: "asc" },
   });
 

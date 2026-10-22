@@ -1,8 +1,10 @@
 "use client";
 
+import Link from "next/link";
 import { nanoid } from "nanoid";
 import { useSearchParams } from "next/navigation";
-import { Suspense, useState } from "react";
+import { Suspense } from "react";
+import { ClipboardCheck } from "lucide-react";
 import { useTerrain } from "@/components/terrain/terrain-provider";
 import { enqueueGeneric } from "@/lib/offline/sync";
 import { startOfDay } from "@/lib/utils";
@@ -16,7 +18,6 @@ function MenageInner() {
   const today = startOfDay().getTime();
   const week = today - 6 * 24 * 3600 * 1000;
   const retard = isCreneauEnRetard(creneauCourant(bootstrap.params), bootstrap.params);
-  const [checks, setChecks] = useState<Record<string, boolean>>({});
 
   async function cocher(tacheId: string) {
     const clientUuid = nanoid();
@@ -34,90 +35,28 @@ function MenageInner() {
     await refresh();
   }
 
-  async function signerChecklist(checklistId: string, itemIds: string[]) {
-    const clientUuid = nanoid();
-    await enqueueGeneric("checklist_execution", clientUuid, {
-      clientUuid,
-      etablissementId: session.etablissementId,
-      codeOperateurId: session.codeOperateurId,
-      checklistId,
-      items: itemIds.filter((id) => checks[id]),
-    });
-    bootstrap.checklistExecutions.push({
-      checklistId,
-      createdAt: new Date().toISOString(),
-    });
-    await refresh();
-  }
-
   return (
     <div className="space-y-6 pb-10">
       <div>
         <h1 className="font-serif text-2xl font-semibold text-slate-900">Plan de nettoyage</h1>
         <p className="text-sm text-slate-500">
-          Check-lists d’ouverture et de fermeture de {session.prenom}, puis les surfaces du jour.
+          Surfaces du jour à cocher et signer par {session.prenom}.
           {retard ? " Des tâches sont en retard." : ""}
         </p>
       </div>
 
-      <section className="space-y-3">
-        <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-700">
-          Check-lists · {session.prenom} {session.nom}
-        </h2>
-        {bootstrap.checklists
-          .filter((cl) => cl.type === "ouverture" || cl.type === "fermeture")
-          .sort((a, b) => (a.type === "ouverture" ? -1 : b.type === "ouverture" ? 1 : 0))
-          .map((cl) => {
-            const done = bootstrap.checklistExecutions.some(
-              (e) =>
-                e.checklistId === cl.id &&
-                new Date(e.createdAt).getTime() >= today &&
-                (!e.codeOperateurId || e.codeOperateurId === session.codeOperateurId),
-            );
-            const allChecked = cl.items.every((i) => checks[i.id]);
-            return (
-              <div
-                key={cl.id}
-                className={`rounded-3xl border-2 bg-white p-4 shadow-sm ${
-                  cl.type === "ouverture" ? "border-teal-400" : "border-slate-800"
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <h2 className="font-serif text-lg font-semibold text-slate-900">{cl.nom}</h2>
-                  <Badge variant={done ? "ok" : "info"}>{cl.type}</Badge>
-                </div>
-                <p className="mt-1 text-xs text-slate-500">Signature individuelle de {session.prenom}</p>
-                <ul className="mt-3 space-y-2">
-                  {cl.items.map((item) => (
-                    <li key={item.id}>
-                      <label className="flex items-center gap-3 text-sm text-slate-700">
-                        <input
-                          type="checkbox"
-                          checked={Boolean(checks[item.id]) || done}
-                          disabled={done}
-                          onChange={(e) => setChecks((c) => ({ ...c, [item.id]: e.target.checked }))}
-                          className="h-5 w-5 accent-teal-400"
-                        />
-                        {item.libelle}
-                      </label>
-                    </li>
-                  ))}
-                </ul>
-                {!done ? (
-                  <Button
-                    className="mt-4 w-full"
-                    disabled={!allChecked}
-                    onClick={() => void signerChecklist(cl.id, cl.items.map((i) => i.id))}
-                  >
-                    Signer · {session.prenom}
-                  </Button>
-                ) : (
-                  <p className="mt-3 text-xs text-emerald-700">Signée aujourd’hui par {session.prenom}</p>
-                )}
-              </div>
-            );
-          })}
-      </section>
+      <Link
+        href="/terrain/checklist"
+        className="flex items-center gap-3 rounded-3xl border border-teal-200 bg-teal-50 p-4"
+      >
+        <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-white text-teal-800">
+          <ClipboardCheck className="h-5 w-5" />
+        </span>
+        <span>
+          <span className="block font-semibold text-slate-900">Check-lists ouverture / fermeture</span>
+          <span className="text-sm text-slate-500">Signature individuelle de {session.prenom}</span>
+        </span>
+      </Link>
 
       {bootstrap.tachesNettoyage.map((tache) => {
         const windowStart = tache.frequence === "hebdo" || tache.frequence === "mensuel" ? week : today;

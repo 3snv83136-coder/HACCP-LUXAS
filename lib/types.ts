@@ -131,3 +131,14 @@ export type BootstrapPayload = {
   nonConformitesOuvertes: number;
   notifications: { id: string; type: string; message: string; createdAt: string }[];
 };
+
+export type MessageVue = {
+  id: string;
+  canal: string;
+  etablissementId: string;
+  auteurType: string;
+  auteurNom: string;
+  texte: string;
+  createdAt: string;
+  pieces: { id: string; nom: string; mime: string; contenu: string }[];
+};

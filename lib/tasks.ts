@@ -3,6 +3,7 @@ import {
   isCreneauEnRetard,
   type CreneauReleve,
 } from "@/lib/conformity";
+import { creneauOuvertCeJour } from "@/lib/jours-releve";
 import type { BootstrapPayload, ReleveLocal, TacheDuJour } from "@/lib/types";
 import { startOfDay } from "@/lib/utils";
 
@@ -28,12 +29,15 @@ export function buildTachesDuJour(
   data: BootstrapPayload,
   releves: ReleveLocal[],
   now = new Date(),
+  codeOperateurId?: string,
 ): TacheDuJour[] {
   const creneau = creneauCourant(data.params, now);
-  const retard = isCreneauEnRetard(creneau, data.params, now);
+  const ouvert = creneauOuvertCeJour(creneau, data.params, now);
+  const retard = ouvert && isCreneauEnRetard(creneau, data.params, now);
   const taches: TacheDuJour[] = [];
 
   for (const eq of data.equipements.filter((e) => e.actif)) {
+    if (!ouvert) continue;
     const last = releveDuCreneau(releves, eq.id, creneau, now);
     const statut = last ? "fait" : retard ? "en_retard" : "a_faire";
     taches.push({
@@ -89,10 +93,17 @@ export function buildTachesDuJour(
 
   for (const cl of data.checklists) {
     const done = data.checklistExecutions.some(
-      (e) => e.checklistId === cl.id && new Date(e.createdAt).getTime() >= todayStart,
+      (e) =>
+        e.checklistId === cl.id &&
+        new Date(e.createdAt).getTime() >= todayStart &&
+        (!codeOperateurId || !e.codeOperateurId || e.codeOperateurId === codeOperateurId),
     );
     const pertinente =
-      cl.type === "ouverture" ? creneau === "matin" || done : cl.type === "fermeture" ? creneau === "soir" || done : true;
+      cl.type === "ouverture"
+        ? (creneau === "matin" && creneauOuvertCeJour("matin", data.params, now)) || done
+        : cl.type === "fermeture"
+          ? (creneau === "soir" && creneauOuvertCeJour("soir", data.params, now)) || done
+          : true;
     if (!pertinente && !done) continue;
     taches.push({
       id: `cl-${cl.id}`,
@@ -100,7 +111,7 @@ export function buildTachesDuJour(
       titre: cl.nom,
       sousTitre: cl.type,
       statut: done ? "fait" : retard ? "en_retard" : "a_faire",
-      href: `/terrain/menage?checklist=${cl.id}`,
+      href: `/terrain/checklist?checklist=${cl.id}`,
     });
   }
 

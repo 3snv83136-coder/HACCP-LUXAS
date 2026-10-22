@@ -50,15 +50,16 @@ export function codeBarresNormalise(raw: string) {
   return clean || "SANITRACE";
 }
 
-export function barresCode39(raw: string) {
+/** Code 39 : 9 modules alternés barre/espace, puis un espace étroit entre caractères. */
+export function modulesCode39(raw: string) {
   const payload = `*${codeBarresNormalise(raw)}*`;
-  const bars: { large: boolean; gap: boolean }[] = [];
+  const modules: { bar: boolean; large: boolean }[] = [];
   for (const ch of payload) {
     const pattern = PATTERNS[ch] ?? PATTERNS["0"];
-    for (const bit of pattern) {
-      bars.push({ large: bit === "w", gap: false });
+    for (let i = 0; i < pattern.length; i += 1) {
+      modules.push({ bar: i % 2 === 0, large: pattern[i] === "w" });
     }
-    bars.push({ large: false, gap: true });
+    modules.push({ bar: false, large: false });
   }
-  return bars;
+  return modules;
 }
