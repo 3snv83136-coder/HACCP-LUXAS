@@ -7,11 +7,11 @@ const badgeVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-slate-100 text-slate-700",
-        ok: "bg-emerald-100 text-emerald-800",
-        nok: "bg-red-100 text-red-800",
-        warn: "bg-amber-100 text-amber-800",
-        info: "bg-teal-100 text-teal-800",
+        default: "bg-white/70 text-teal-900",
+        ok: "bg-emerald-200 text-emerald-900",
+        nok: "bg-red-200 text-red-900",
+        warn: "bg-amber-200 text-amber-950",
+        info: "bg-teal-200 text-teal-950",
       },
     },
     defaultVariants: { variant: "default" },

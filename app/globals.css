@@ -3,8 +3,8 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #0f172a;
+  --background: #e6f6f2;
+  --foreground: #134e4a;
   --ok: #059669;
   --nok: #dc2626;
   --warn: #d97706;
@@ -17,7 +17,22 @@ body {
 
 body {
   color: var(--foreground);
-  background: #ffffff;
+  background-color: #e6f6f2;
+  background-image:
+    radial-gradient(ellipse 90% 55% at 0% -8%, rgba(45, 212, 191, 0.45), transparent 58%),
+    radial-gradient(ellipse 70% 48% at 100% 0%, rgba(56, 189, 248, 0.3), transparent 52%),
+    radial-gradient(ellipse 50% 38% at 88% 100%, rgba(253, 224, 71, 0.24), transparent 50%),
+    radial-gradient(ellipse 42% 32% at 8% 100%, rgba(52, 211, 153, 0.3), transparent 48%);
+  background-attachment: fixed;
+}
+
+.rounded-3xl.bg-white:not(.etiquette-ticket),
+.rounded-2xl.bg-white {
+  background-color: rgb(255 255 255 / 0.66);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-color: rgb(153 246 228 / 0.7);
+  box-shadow: 0 16px 40px -24px rgb(13 148 136 / 0.55);
 }
 
 .font-mono {
@@ -42,6 +57,13 @@ body {
     margin: 0 !important;
     padding: 0 !important;
     background: white !important;
+    background-image: none !important;
+  }
+  .rounded-3xl.bg-white,
+  .rounded-2xl.bg-white {
+    background: white !important;
+    backdrop-filter: none !important;
+    box-shadow: none !important;
   }
   .etiquette-print-root {
     background: white !important;

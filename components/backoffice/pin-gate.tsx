@@ -59,7 +59,8 @@ export function BackofficePinGate({ children }: { children: ReactNode }) {
     return (
       <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col px-6 py-8">
         <BackArrow />
-        <BrandLogo size={56} className="mt-8" />
+        <div className="mt-8 rounded-3xl border border-teal-200/80 bg-white/70 p-5 backdrop-blur-xl">
+        <BrandLogo size={56} />
         <h1 className="mt-4 font-serif text-3xl font-semibold text-slate-900">Back-office</h1>
         <p className="mt-2 text-sm text-slate-500">Code à 4 chiffres de la gérance.</p>
         <p className="mt-8 text-center font-mono text-5xl tracking-[0.4em] text-slate-900">{pin.padEnd(4, "•")}</p>
@@ -75,6 +76,7 @@ export function BackofficePinGate({ children }: { children: ReactNode }) {
           <Button className="w-full" size="lg" disabled={pin.length !== 4 || saving} onClick={() => void valider()}>
             {saving ? "Vérification…" : "Entrer"}
           </Button>
+        </div>
         </div>
       </div>
     );

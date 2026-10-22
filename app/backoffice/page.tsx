@@ -71,10 +71,10 @@ export default function DashboardPage() {
   if (!data) return <p className="text-slate-500">Chargement du tableau de bord…</p>;
 
   const cards = [
-    { label: "En retard", value: data.compteurs.enRetard, tone: "bg-amber-100 text-amber-900" },
-    { label: "À faire", value: data.compteurs.aFaire, tone: "bg-sky-100 text-sky-900" },
-    { label: "Fait", value: data.compteurs.fait, tone: "bg-emerald-100 text-emerald-900" },
-    { label: "NC ouvertes", value: data.compteurs.ncOuvertes, tone: "bg-red-100 text-red-900" },
+    { label: "En retard", value: data.compteurs.enRetard, tone: "bg-amber-300 text-amber-950" },
+    { label: "À faire", value: data.compteurs.aFaire, tone: "bg-sky-300 text-sky-950" },
+    { label: "Fait", value: data.compteurs.fait, tone: "bg-emerald-300 text-emerald-950" },
+    { label: "NC ouvertes", value: data.compteurs.ncOuvertes, tone: "bg-rose-300 text-rose-950" },
   ];
 
   return (
@@ -116,17 +116,17 @@ export default function DashboardPage() {
       <div className="grid gap-3 sm:grid-cols-2">
         <Link
           href="/backoffice/personnel"
-          className="rounded-3xl border border-slate-200 bg-white p-5 hover:border-teal-300"
+          className="rounded-3xl border border-sky-300 bg-gradient-to-br from-sky-100 to-white/70 p-5 hover:border-sky-400"
         >
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-teal-700">Équipe</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-sky-800">Équipe</p>
           <p className="mt-1 text-lg font-semibold">Salariés & accès</p>
           <p className="mt-1 text-sm text-slate-500">Ajouter un salarié, un gérant ou un code back-office.</p>
         </Link>
         <Link
           href="/backoffice/produits"
-          className="rounded-3xl border border-slate-200 bg-white p-5 hover:border-teal-300"
+          className="rounded-3xl border border-emerald-300 bg-gradient-to-br from-emerald-100 to-white/70 p-5 hover:border-emerald-400"
         >
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-teal-700">Traçabilité</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-800">Traçabilité</p>
           <p className="mt-1 text-lg font-semibold">Produits</p>
           <p className="mt-1 text-sm text-slate-500">Réceptions et lots filtrés par jour, semaine ou mois.</p>
         </Link>

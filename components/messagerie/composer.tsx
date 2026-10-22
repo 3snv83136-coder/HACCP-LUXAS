@@ -46,7 +46,7 @@ export function MessageComposer({ placeholder, onSend, sombre = false }: Compose
   }
 
   return (
-    <div className={sombre ? "space-y-3 rounded-3xl border border-white/10 bg-black/40 p-4" : "space-y-3 rounded-3xl border border-slate-200 bg-white p-4"}>
+    <div className={sombre ? "space-y-3 rounded-3xl border border-white/10 bg-black/40 p-4" : "space-y-3 rounded-3xl border border-teal-200/80 bg-white/70 p-4 backdrop-blur-xl"}>
       <textarea
         value={texte}
         onChange={(e) => setTexte(e.target.value)}

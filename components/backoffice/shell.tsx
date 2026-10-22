@@ -82,27 +82,27 @@ export function BackofficeShell({ children }: { children: ReactNode }) {
 
   return (
     <BackofficePinGate>
-    <div className="min-h-dvh overflow-x-hidden bg-white text-slate-900">
+    <div className="min-h-dvh overflow-x-hidden bg-transparent text-slate-900">
       <div className="flex min-h-dvh">
-        <aside className="hidden w-64 shrink-0 border-r border-slate-200 bg-white p-5 lg:block">
+        <aside className="hidden w-64 shrink-0 border-r border-teal-200/60 bg-teal-900 p-5 text-white lg:block">
           <Link href="/" className="block">
             <BrandLogo size={72} src={compte?.logoUrl} alt={nomEtablissement} className="rounded-2xl" />
-            <SanitraceNom className="mt-3" />
-            <p className="mt-1 truncate text-lg font-semibold">{nomEtablissement}</p>
-            <p className="text-sm text-slate-500">Back-office</p>
+            <SanitraceNom className="mt-3 text-teal-200" />
+            <p className="mt-1 truncate text-lg font-semibold text-white">{nomEtablissement}</p>
+            <p className="text-sm text-teal-100/80">Back-office</p>
           </Link>
           <nav className="mt-8 max-h-[calc(100dvh-16rem)] space-y-1 overflow-y-auto pr-1">
             {nav.map((item) => (
               <NavLink key={item.href} item={item} active={lienActif(item.href, pathname)} />
             ))}
           </nav>
-          <Link href="/terrain" className="mt-8 block text-xs text-slate-400">
+          <Link href="/terrain" className="mt-8 block text-xs text-teal-200/80">
             ← App terrain
           </Link>
         </aside>
 
         <div className="flex min-w-0 flex-1 flex-col">
-          <header className="sticky top-0 z-20 flex items-center justify-between gap-2 border-b border-slate-200 bg-white/95 px-3 py-3 backdrop-blur sm:px-6 md:px-8">
+          <header className="sticky top-0 z-20 flex items-center justify-between gap-2 border-b border-teal-200/50 bg-white/55 px-3 py-3 backdrop-blur-xl sm:px-6 md:px-8">
             <div className="flex min-w-0 items-center gap-2 sm:gap-3">
               <BackArrow />
               <BrandLogo
@@ -140,7 +140,7 @@ export function BackofficeShell({ children }: { children: ReactNode }) {
         </div>
       </div>
 
-      <nav className="fixed inset-x-0 bottom-0 z-20 grid grid-cols-4 gap-1 border-t border-slate-200 bg-white/95 p-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] lg:hidden">
+      <nav className="fixed inset-x-0 bottom-0 z-20 grid grid-cols-4 gap-1 border-t border-teal-200/60 bg-white/70 p-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] backdrop-blur-xl lg:hidden">
         {mobileQuick.map((item) =>
           item.href === "#menu" ? (
             <button
@@ -169,8 +169,8 @@ export function BackofficeShell({ children }: { children: ReactNode }) {
       </nav>
 
       {menuOpen ? (
-        <div className="fixed inset-0 z-50 bg-white lg:hidden">
-          <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3">
+        <div className="fixed inset-0 z-50 bg-teal-50 lg:hidden">
+          <div className="flex items-center justify-between border-b border-teal-200 px-4 py-3">
             <div>
               <SanitraceNom />
               <p className="font-semibold">{nomEtablissement}</p>
@@ -225,7 +225,7 @@ function NavLink({
       href={item.href}
       className={cn(
         "flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm",
-        active ? "bg-teal-50 font-semibold text-teal-900" : "text-slate-600 hover:bg-slate-50 hover:text-slate-900",
+        active ? "bg-teal-400 font-semibold text-teal-950" : "text-teal-50 hover:bg-teal-800 hover:text-white",
       )}
     >
       <item.icon className="h-4 w-4 shrink-0" />

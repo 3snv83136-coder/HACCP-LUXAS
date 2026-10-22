@@ -13,18 +13,24 @@ const acces = [
     label: "Accès Employé",
     texte: "Relevés, check-lists, infos du gérant, ménage et étiquettes.",
     icon: ChefHat,
+    card: "border-teal-300 bg-gradient-to-br from-teal-200/80 via-white/50 to-emerald-100/80",
+    iconWrap: "bg-teal-500 text-white",
   },
   {
     href: "/backoffice",
     label: "Accès Administrateur",
     texte: "Équipe, messagerie, équipements, traçabilité et paramétrage.",
     icon: LayoutDashboard,
+    card: "border-sky-300 bg-gradient-to-br from-sky-200/80 via-white/50 to-cyan-100/80",
+    iconWrap: "bg-sky-500 text-white",
   },
   {
     href: "/hygiene",
     label: "Accès Hygiène",
     texte: "Dossier inspecteur et export PDF.",
     icon: ClipboardCheck,
+    card: "border-amber-300 bg-gradient-to-br from-amber-200/80 via-white/50 to-orange-100/80",
+    iconWrap: "bg-amber-500 text-white",
   },
 ];
 
@@ -73,7 +79,7 @@ export default function AccueilPage() {
 
   return (
     <main className="mx-auto flex min-h-dvh w-full max-w-5xl flex-col px-4 py-6 sm:px-6 sm:py-10">
-      <header className="flex flex-wrap items-center justify-between gap-3">
+      <header className="flex flex-wrap items-center justify-between gap-3 rounded-3xl border border-teal-200/70 bg-white/65 px-4 py-3 backdrop-blur-xl">
         <div className="flex min-w-0 items-center gap-3">
           <LogoSanitrace size={48} />
           <div className="min-w-0">
@@ -114,13 +120,13 @@ export default function AccueilPage() {
           <Link
             key={a.href}
             href={a.href}
-            className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition hover:border-teal-500"
+            className={`rounded-3xl border p-6 shadow-sm backdrop-blur-xl transition hover:scale-[1.01] ${a.card}`}
           >
-            <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-teal-50 text-teal-800">
+            <span className={`inline-flex h-12 w-12 items-center justify-center rounded-2xl ${a.iconWrap}`}>
               <a.icon className="h-6 w-6" />
             </span>
             <h2 className="mt-5 font-serif text-xl font-semibold text-slate-900">{a.label}</h2>
-            <p className="mt-2 text-sm leading-relaxed text-slate-500">{a.texte}</p>
+            <p className="mt-2 text-sm leading-relaxed text-slate-600">{a.texte}</p>
             <p className="mt-6 text-sm font-semibold text-teal-800">Ouvrir →</p>
           </Link>
         ))}

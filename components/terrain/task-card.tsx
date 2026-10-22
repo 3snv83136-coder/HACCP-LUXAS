@@ -15,7 +15,7 @@ export function TaskCard({ tache }: { tache: TacheDuJour }) {
   return (
     <Link
       href={tache.href}
-      className="flex items-center gap-3 rounded-3xl border border-slate-200 bg-white p-4 shadow-sm active:scale-[0.99]"
+      className="flex items-center gap-3 rounded-3xl border border-teal-200/80 bg-white/75 p-4 shadow-sm backdrop-blur-xl active:scale-[0.99]"
     >
       <div
         className={`h-12 w-1.5 rounded-full ${

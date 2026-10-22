@@ -19,16 +19,16 @@ import { TaskCard } from "@/components/terrain/task-card";
 import { useTerrain } from "@/components/terrain/terrain-provider";
 
 const shortcuts = [
-  { href: "/terrain/scan", label: "Scan QR", icon: Camera },
-  { href: "/terrain/scan-etiquette", label: "Scanner", icon: ScanBarcode },
-  { href: "/terrain/checklist", label: "Check-list", icon: ClipboardCheck },
-  { href: "/terrain/infos", label: "Infos", icon: Megaphone },
-  { href: "/terrain/tracabilite", label: "Traçabilité", icon: Images },
-  { href: "/terrain/reception", label: "Réception", icon: Package },
-  { href: "/terrain/menage", label: "Ménage", icon: Droplets },
-  { href: "/terrain/temoins", label: "Témoins", icon: UtensilsCrossed },
-  { href: "/terrain/huile", label: "Huile", icon: Flame },
-  { href: "/terrain/nc", label: "Alerte", icon: TriangleAlert },
+  { href: "/terrain/scan", label: "Scan QR", icon: Camera, tone: "border-sky-300 bg-sky-100 text-sky-900" },
+  { href: "/terrain/scan-etiquette", label: "Scanner", icon: ScanBarcode, tone: "border-teal-300 bg-teal-100 text-teal-900" },
+  { href: "/terrain/checklist", label: "Check-list", icon: ClipboardCheck, tone: "border-emerald-300 bg-emerald-100 text-emerald-900" },
+  { href: "/terrain/infos", label: "Infos", icon: Megaphone, tone: "border-amber-300 bg-amber-100 text-amber-950" },
+  { href: "/terrain/tracabilite", label: "Traçabilité", icon: Images, tone: "border-cyan-300 bg-cyan-100 text-cyan-950" },
+  { href: "/terrain/reception", label: "Réception", icon: Package, tone: "border-lime-300 bg-lime-100 text-lime-950" },
+  { href: "/terrain/menage", label: "Ménage", icon: Droplets, tone: "border-blue-300 bg-blue-100 text-blue-950" },
+  { href: "/terrain/temoins", label: "Témoins", icon: UtensilsCrossed, tone: "border-orange-300 bg-orange-100 text-orange-950" },
+  { href: "/terrain/huile", label: "Huile", icon: Flame, tone: "border-yellow-300 bg-yellow-100 text-yellow-950" },
+  { href: "/terrain/nc", label: "Alerte", icon: TriangleAlert, tone: "border-rose-300 bg-rose-100 text-rose-950" },
 ];
 
 export default function TerrainHomePage() {
@@ -60,21 +60,21 @@ export default function TerrainHomePage() {
         </section>
       ))}
 
-      <section className="rounded-3xl border border-slate-200 bg-teal-50 p-5">
-        <p className="text-xs uppercase tracking-[0.18em] text-teal-700">Aujourd’hui</p>
-        <h1 className="mt-1 text-3xl font-semibold text-slate-900">Mes tâches</h1>
-        <p className="mt-2 text-sm text-slate-500">
+      <section className="rounded-3xl border border-teal-300 bg-gradient-to-br from-teal-400 via-teal-300 to-emerald-200 p-5 text-teal-950 shadow-sm">
+        <p className="text-xs uppercase tracking-[0.18em] text-teal-900/80">Aujourd’hui</p>
+        <h1 className="mt-1 text-3xl font-semibold text-teal-950">Mes tâches</h1>
+        <p className="mt-2 text-sm text-teal-900/80">
           {aFaire} à faire
           {retard > 0 ? ` · ${retard} en retard` : ""} · {bootstrap.nonConformitesOuvertes} NC ouvertes
         </p>
-        <button type="button" onClick={() => void refresh()} className="mt-3 text-xs text-slate-400">
+        <button type="button" onClick={() => void refresh()} className="mt-3 text-xs text-teal-800 underline">
           Actualiser
         </button>
       </section>
 
       <Link
         href="/terrain/scan-etiquette"
-        className="flex items-center gap-4 rounded-3xl border border-teal-200 bg-white p-4 shadow-sm"
+        className="flex items-center gap-4 rounded-3xl border border-teal-300 bg-gradient-to-r from-white/80 to-teal-100 p-4 shadow-sm backdrop-blur-xl"
       >
         <span className="inline-flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-teal-50 text-teal-800">
           <ScanBarcode className="h-7 w-7" />
@@ -90,9 +90,9 @@ export default function TerrainHomePage() {
           <Link
             key={s.href}
             href={s.href}
-            className="flex flex-col items-center gap-2 rounded-2xl border border-slate-200 bg-white py-3 text-[10px] font-medium uppercase tracking-wide text-slate-600 shadow-sm"
+            className={`flex flex-col items-center gap-2 rounded-2xl border py-3 text-[10px] font-medium uppercase tracking-wide shadow-sm ${s.tone}`}
           >
-            <s.icon className="h-5 w-5 text-teal-700" />
+            <s.icon className="h-5 w-5" />
             {s.label}
           </Link>
         ))}

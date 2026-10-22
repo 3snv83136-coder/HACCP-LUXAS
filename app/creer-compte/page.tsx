@@ -59,7 +59,10 @@ export default function CreerComptePage() {
         d’autres ensuite.
       </p>
 
-      <form className="mt-8 space-y-8" onSubmit={(e) => void creer(e)}>
+      <form
+        className="mt-8 space-y-8 rounded-3xl border border-teal-200/70 bg-white/70 p-5 shadow-sm backdrop-blur-xl"
+        onSubmit={(e) => void creer(e)}
+      >
         <fieldset className="space-y-4">
           <legend className="font-serif text-xl font-semibold text-slate-900">L’établissement</legend>
           <Field label="Nom de l’établissement">

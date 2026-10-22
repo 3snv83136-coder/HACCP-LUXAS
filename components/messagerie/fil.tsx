@@ -23,7 +23,7 @@ export function FilMessages({
           className={
             sombre
               ? "rounded-3xl border border-white/10 bg-black/40 p-4"
-              : "rounded-3xl border border-slate-200 bg-white p-4 shadow-sm"
+              : "rounded-3xl border border-teal-200/80 bg-white/70 p-4 shadow-sm backdrop-blur-xl"
           }
         >
           <div className="flex items-baseline justify-between gap-3">

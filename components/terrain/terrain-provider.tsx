@@ -238,7 +238,7 @@ export function TerrainProvider({ children }: { children: ReactNode }) {
   return (
     <TerrainContext.Provider value={value}>
       <div className="mx-auto flex min-h-dvh w-full max-w-lg flex-col md:max-w-2xl lg:max-w-4xl">
-        <header className="sticky top-0 z-20 flex items-center justify-between gap-3 border-b border-slate-200 bg-white/90 px-4 py-3 backdrop-blur">
+        <header className="sticky top-0 z-20 flex items-center justify-between gap-3 border-b border-teal-200/50 bg-white/55 px-4 py-3 backdrop-blur-xl">
           <div className="flex min-w-0 items-center gap-3">
             <BackArrow />
             <BrandLogo

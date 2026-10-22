@@ -45,7 +45,10 @@ export function ConnexionForm() {
       <h1 className="mt-4 font-serif text-3xl font-semibold text-slate-900">Connexion</h1>
       <p className="mt-2 text-sm text-slate-500">E-mail du restaurant et mot de passe.</p>
 
-      <form className="mt-8 space-y-4" onSubmit={(e) => void connecter(e)}>
+      <form
+        className="mt-8 space-y-4 rounded-3xl border border-teal-200/70 bg-white/70 p-5 shadow-sm backdrop-blur-xl"
+        onSubmit={(e) => void connecter(e)}
+      >
         <label className="block space-y-1.5">
           <Label>Adresse e-mail du restaurant</Label>
           <Input

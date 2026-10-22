@@ -16,8 +16,8 @@ export default function HygieneLayout({ children }: { children: ReactNode }) {
   }
 
   return (
-    <div className="min-h-dvh w-full overflow-x-hidden bg-slate-50 text-slate-900">
-      <header className="sticky top-0 z-20 flex items-center justify-between border-b border-slate-200 bg-white/95 px-4 py-3 backdrop-blur">
+    <div className="min-h-dvh w-full overflow-x-hidden bg-transparent text-slate-900">
+      <header className="sticky top-0 z-20 flex items-center justify-between border-b border-teal-200/50 bg-white/55 px-4 py-3 backdrop-blur-xl">
         <div className="flex min-w-0 items-center gap-3">
           <BackArrow />
           <BrandLogo size={36} src={compte?.logoUrl} alt={compte?.nom ?? "Établissement"} className="rounded-lg" />
